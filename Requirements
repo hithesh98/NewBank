@@ -1,0 +1,41 @@
+NewBank Software App – Group 15 Functional and Non-Functional Requirements
+
+Overview:
+NewBank is an idea for a new disrupter bank where customers can interact with their accounts via a simple command-line interface. The originator of this idea has produced some basic client-server code as well as a protocol for sending commands and receiving responses from the NewBank server. The originator of the idea has asked your group to further develop their base code - specifically, implementing the protocol. However, the originator is also keen for input and your team can alter or add to the protocol to improve interaction with the NewBank server as well as to add new services. For example, the originator is keen for NewBank customers to be able to offer micro-loans to other NewBank customers in a micro-loan marketplace. You and a team of developers have taken up this challenge. Your team have access to the originators basic client-server code as well as the protocol for sending commands and receiving responses from the NewBank server. The originator has said that your group can add to, remove and/or alter any part of this basic code as well as the proposed protocol. Their only requirement is that customers have to interact via a command-line interface and that any changes/additions to the protocol are fully documented.
+
+1.	Functional Requirements
+
+	a.	Sign up function – allows user to create new account
+	b.	Login function – allows user to login to account
+	c.	Change account details – allows user to change account details i.e. address, employer
+	d.	Show account function – allows logged in user to show account details and all transactions
+	e.	Deposit money function – allows user to deposit money
+	f.	Withdraw money function – allows user to withdraw money
+	g.	Transfer money function – allows user to transfer money to another account of the same bank
+	h.	Pay money function – allows user to pay money to another bank account 
+	i.	Register as a lender function – allows user to register as a lender for bank’s microloan service
+	j.	Show lender function – shows user a list of available micro-lenders
+	k.	Borrow from a micro-loan – allows user to borrow a micro-lender specifying amount needed and repayment term, any income details, credit checks. 
+	l.	Show loans – show the user current outstanding loans
+	m.	Logout function – allows user to log out of account 
+
+2.	Non-Functional Requirements
+
+	a.	Security requirements
+		i.	Account ID, PIN and Password protection happens at the first level within the system. To access internet banking, users are required to insert account ID and password. Without these, access denied. Special password characters may be imposed by the Bank to provide a greater degree of security. The following characters may be used as required :!@#$%^&*()_+-=[]{}|\;:’”, /? 
+
+		ii.	Auto Timeout Screen Blanking – 5 minutes of inactivity then time-out. The auto timeout feature warns users every 30 seconds prior to a pending timeout. 
+
+		iii.	Sign-off Button – user has the option to sign off after they have finished using the app. 
+
+		iv.	Failed login attempts -  users are denied access after a pre-determined number of failed log-on attempts. If users have been locked out due to exceeding the pre-determined number of log-on attempts, the users must contact the Bank in order to be reinitialized. 
+		
+		v.	Encryption In addition to password protection.
+
+	b.	Performance requirements
+		i.	Increase customer satisfaction by allowing customers to access banking services 24/7, 365 days a year with minimum downtime period for backup and maintenance
+		ii.	Expand services and products by providing facilities for NewBank to offer new services and products onto its homepage. 
+		iii.	Reduce costs by minimising costs of processing transactions and reduce the number of branches required to service an equivalent number of customer. 
+
+	c.	Safety requirements
+		i.	Ensure back up, recovery and business continuity by ensuring sufficient back up of data in accordance to rules and regulations. Back up should be done periodically. 
