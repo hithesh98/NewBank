@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Customer {
 	
-	private static ArrayList<Account> accounts;
+	private ArrayList<Account> accounts;
 	
 	public Customer() {
 		accounts = new ArrayList<>();
@@ -18,7 +18,7 @@ public class Customer {
 		return s;
 	}
 
-	public static void addAccount(Account account) {
+	public void addAccount(Account account) {
 		accounts.add(account);		
 	}
 }

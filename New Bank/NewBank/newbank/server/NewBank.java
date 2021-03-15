@@ -41,7 +41,7 @@ public class NewBank {
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
 			if (request.startsWith("NEWACCOUNT")){
-			return openAccount(request.substring(request.indexOf(" ")));
+			return openAccount(customer, request.substring(request.indexOf(" ")));
 			}
 			switch(request) {
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
@@ -51,8 +51,8 @@ public class NewBank {
 		return "FAIL";
 	}
 
-	private String openAccount(String accountName) {
-		Customer.addAccount(new Account(accountName, 0.00));
+	private String openAccount(CustomerID customer, String accountName) {
+		(customers.get(customer.getKey())).addAccount(new Account(accountName, 0.00));
 		return "SUCCESS";
 	}
 
