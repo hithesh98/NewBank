@@ -31,13 +31,16 @@ public class NewBankClientHandler extends Thread{
 			out.println("Checking Details...");
 			// authenticate user and get customer ID token from bank for use in subsequent requests
 			CustomerID customer = bank.checkLogInDetails(userName, password);
+
+			out.println("Enter the customer name to whom the payment needs to be made: ");
+			String customerPayment = in.readLine();
 			// if the user is authenticated then get requests from the user and process them 
 			if(customer != null) {
 				out.println("Log In Successful. What do you want to do?");
 				while(true) {
 					String request = in.readLine();
 					System.out.println("Request from " + customer.getKey());
-					String responce = bank.processRequest(customer, request);
+					String responce = bank.processRequest(customer, request, customerPayment);
 					out.println(responce);
 				}
 			}

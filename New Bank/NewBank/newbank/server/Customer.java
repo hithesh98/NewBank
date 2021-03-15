@@ -5,6 +5,16 @@ import java.util.ArrayList;
 public class Customer {
 	
 	private ArrayList<Account> accounts;
+
+	public String getBankName() {
+		return bankName;
+	}
+
+	public void setBankName(String bankName) {
+		this.bankName = bankName;
+	}
+
+	private String bankName;
 	
 	public Customer() {
 		accounts = new ArrayList<>();
