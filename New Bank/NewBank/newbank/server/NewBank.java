@@ -40,8 +40,18 @@ public class NewBank {
 	// commands from the NewBank customer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
+			String[] input = request.split(" "); // create an array of the parsed input string
 			if (request.startsWith("NEWACCOUNT")){
-			return openAccount(customer, request.substring(request.indexOf(" ")));
+				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
+			}
+			if(input[0].equals("MOVE")) {
+				if(input.length < 4) { // return fail if not enough information is provided
+					return "FAIL";
+				}
+				double amount = Double.parseDouble(input[1]);
+				String from = input[2];
+				String to = input[3];
+				return moveFunds(customer,amount,from,to);
 			}
 			switch(request) {
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
@@ -60,4 +70,16 @@ public class NewBank {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
 
+	private String moveFunds(CustomerID customer,double amount,String from,String to) {
+		if(amount > 0) { // should never need to move a negative amount
+			if((customers.get(customer.getKey())).editAccountBalance(from,-amount)) { // try to remove amount
+				if((customers.get(customer.getKey())).editAccountBalance(to,amount)) { // try to add amount
+					return "SUCCESS";
+				} else { // if adding was unsuccessful, add it back to the original account
+					(customers.get(customer.getKey())).editAccountBalance(from,amount);
+				}
+			}
+		}
+		return "FAIL";
+	}
 }
