@@ -1,29 +1,59 @@
 package newbank.server;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.HashMap;
+
 
 public class NewBank {
 	
 	private static final NewBank bank = new NewBank();
 	private HashMap<String,Customer> customers;
 
+	private static String userDetails = "";
+
 	private NewBank() {
 		customers = new HashMap<>();
+		if (userDetails!=null){
+			addTestData();
+		}
+	}
+
+	public static String readData(String search, String  filepath) {
+
+		boolean idFound = false;
+		try {
+
+			BufferedReader csvReader = new BufferedReader(new FileReader(filepath));
+			String row = "placeholder";
+			while (row!= null && !idFound) {
+				row = csvReader.readLine();
+				String[] data = row.split(",");
+				if(data[0].equals(search)){
+					userDetails = row;
+					idFound = true;
+					return userDetails;
+				}
+			}
+			csvReader.close();
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();;
+		}
+		return "User not found";
+	}
+
+	public void fetchUserDetails(String username){
+		readData(username, ".\\New Bank\\NewBank\\newbank\\server\\data.csv");
 		addTestData();
 	}
 
 	private void addTestData() {
-		Customer bhagy = new Customer();
-		bhagy.addAccount(new Account("Main", 1000.0));
-		customers.put("Bhagy", bhagy);
+		String[] data = userDetails.split(",");
+		Customer user = new Customer();
+		user.addAccount(new Account(data[1], Double.parseDouble(data[2]) ));
+		customers.put(data[0], user);
 		
-		Customer christina = new Customer();
-		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put("Christina", christina);
-		
-		Customer john = new Customer();
-		john.addAccount(new Account("Checking", 250.0));
-		customers.put("John", john);
 	}
 	
 	public static NewBank getBank() {
