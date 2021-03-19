@@ -28,7 +28,7 @@ public class NewBank {
 		customers.put("Christina", christina);
 
 		Customer john = new Customer();
-		john.addAccount(new Account("Checking", 250.0));
+		john.addAccount(new Account("Savings", 250.0));
 		john.setBankName("bank1");
 		customers.put("John", john);
 
@@ -47,7 +47,7 @@ public class NewBank {
 	}
 
 	// commands from the NewBank customer are processed in this method
-	public synchronized String processRequest(CustomerID customer, String request, String customerId) {
+	public synchronized String processRequest(CustomerID customer, String request){
 		if(customers.containsKey(customer.getKey())) {
 			String[] input = request.split(" "); // create an array of the parsed input string
 			if (request.startsWith("NEWACCOUNT")){
@@ -62,18 +62,19 @@ public class NewBank {
 				String to = input[3];
 				return moveFunds(customer,amount,from,to);
 			}
-			if(input[0].equals("PAYMENT")) {
+			if(input[0].equals("PAY")) {
 				if(input.length < 4) { // return fail if not enough information is provided
 					return "FAIL123";
 				}
 				Customer custCredit = customers.get(customer.getKey());
-				double amount = Double.parseDouble(input[1]);
-				String fromAccount = input[2];
-				String toAccount = input[3];
-				String debitBank = input[4];
-				String credtiBank = input[5];
+				String customerId = input[1];
+				double amount = Double.parseDouble(input[2]);
+				String fromAccount = input[3];
+				String toAccount = input[4];
+				String debitBank = input[5];
+				String creditBank = input[6];
 				Customer custDebit = customers.get(customerId);
-				return payment(custCredit,amount,fromAccount,toAccount, custDebit, debitBank, credtiBank);
+				return payment(custCredit,amount,fromAccount,toAccount, custDebit, debitBank, creditBank);
 
 
 				}
@@ -117,6 +118,6 @@ public class NewBank {
 				}
 			}
 		}
-		return "FAIL";
+		return "FAIL12";
 	}
 }
