@@ -2,7 +2,12 @@ package newbank.server;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.HashMap;
+
 
 
 public class NewBank {
@@ -51,7 +56,12 @@ public class NewBank {
 	private void addTestData() {
 		String[] data = userDetails.split(",");
 		Customer user = new Customer();
-		user.addAccount(new Account(data[1], Double.parseDouble(data[2]) ));
+		int count = 0;
+		while(count < data.length-1){ // loads all accounts and balance from csv file
+			count += 1;
+			user.addAccount(new Account(data[count], Double.parseDouble(data[count+1])));
+			count += 1;
+		}
 		customers.put(data[0], user);
 		
 	}
@@ -93,7 +103,71 @@ public class NewBank {
 
 	private String openAccount(CustomerID customer, String accountName) {
 		(customers.get(customer.getKey())).addAccount(new Account(accountName, 0.00));
+		String customerName = customer.getKey();
+		editEnd(customerName, accountName + ",0"); //adds the account name and balance of 0 to the csv file
 		return "SUCCESS";
+	}
+
+	// Appends to a value to the end of a record by searching for an id
+	private void editEnd(String search, String stringAdd) {
+		String filepath = ".\\New Bank\\NewBank\\newbank\\server\\data.csv";
+		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
+		File oldFile = new File(filepath);
+		File newFile = new File(tempFile);
+		
+
+		try {
+			// Write to a temperory file
+			FileWriter fw = new FileWriter(tempFile, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter pw = new PrintWriter(bw);
+			
+			// read the orginal data.csv file and searches for ID and appends value to the end
+			BufferedReader csvReader = new BufferedReader(new FileReader(filepath));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					String[] data = row.split(",");
+					if(data[0].equals(search)){
+						row += "," + stringAdd;
+					}
+					pw.println(row);
+				}
+			}
+			pw.flush();
+			pw.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		try {
+			// Overwrittes the original data.csv file
+			FileWriter fw2 = new FileWriter(filepath);
+			BufferedWriter bw2 = new BufferedWriter(fw2);
+			PrintWriter pw2 = new PrintWriter(bw2);
+			
+			// Copies all data from temporary file
+			BufferedReader csvReader = new BufferedReader(new FileReader(tempFile));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					pw2.println(row);
+				}
+			}
+			pw2.flush();
+			pw2.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		// deletes the temporary file
+		boolean b = newFile.delete();
 	}
 
 	private String showMyAccounts(CustomerID customer) {
