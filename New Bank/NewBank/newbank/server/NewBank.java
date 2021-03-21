@@ -47,6 +47,9 @@ public class NewBank {
 				return "FAIL";
 			}
 			String name = input[1];
+			if(customers.containsKey(name)){
+				return "FAIL";
+			}
 			double initialDeposit = Double.parseDouble(input[2]);
 			return signUp(name, initialDeposit);
 		} else {
