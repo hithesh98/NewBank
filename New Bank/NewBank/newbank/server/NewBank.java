@@ -41,10 +41,6 @@ public class NewBank {
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
 			String[] input = request.split(" "); // create an array of the parsed input string
-			if (request.startsWith("LOGOFF")){
-				return "LOGOFF";
-			}
-
 			if (request.startsWith("NEWACCOUNT")){
 				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
 			}
