@@ -1,6 +1,6 @@
 package newbank.server;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class NewBank {
 
@@ -14,9 +14,10 @@ public class NewBank {
 	}
 
 	private void addTestData() {
-		//NewBank bank = new NewBank();
 
 		Customer bhagy = new Customer();
+		bhagy.setLender("bhagy lender");
+
 		bhagy.addAccount(new Account("Main", 1000.0));
 		customers.put("Bhagy", bhagy);
 		bhagy.setBankName("bank3");
@@ -46,12 +47,29 @@ public class NewBank {
 		return null;
 	}
 
-	// commands from the NewBank customer are processed in this method
+	// commands from the NewBank cusbtomer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request){
 		if(customers.containsKey(customer.getKey())) {
 			String[] input = request.split(" "); // create an array of the parsed input string
 			if (request.startsWith("NEWACCOUNT")){
 				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
+			}
+			if (request.startsWith("REGISTERLENDER")){
+				if(input.length < 1) { // return fail if not enough information is provided
+					return "FAIL";
+				}
+				Customer cust = customers.get(customer.getKey());
+				return registerLender(cust, input[1]);
+			}
+			if (request.startsWith("BORROWMICROLOAN")){
+				if(input.length < 4) { // return fail if not enough information is provided
+					return "FAIL";
+				}
+				Customer cust = customers.get(customer.getKey());
+				return borrowMicroLoan(cust, input[1], input[2], input[3], input[4]);
+			}
+			if (request.startsWith("SHOWMICROLENDERS")){
+				return showMicroLenders(); // +1 to remove the leading space
 			}
 			if(input[0].equals("MOVE")) {
 				if(input.length < 4) { // return fail if not enough information is provided
@@ -63,8 +81,8 @@ public class NewBank {
 				return moveFunds(customer,amount,from,to);
 			}
 			if(input[0].equals("PAY")) {
-				if(input.length < 4) { // return fail if not enough information is provided
-					return "FAIL123";
+				if(input.length < 7) { // return fail if not enough information is provided
+					return "FAIL";
 				}
 				Customer custCredit = customers.get(customer.getKey());
 				String customerId = input[1];
@@ -84,6 +102,46 @@ public class NewBank {
 			}
 		}
 		return "FAIL";
+	}
+
+	private String borrowMicroLoan(Customer customer, String lender, String amount, String income, String term){
+		Set<String> str = new HashSet<>();
+		for(Customer map: customers.values()){
+
+			str.add(map.getLender());
+		}
+		if(!str.contains(lender)){
+			return  "INVALID LENDER";
+		}
+		MicroLoan loan = new MicroLoan();
+		loan.setAmount(Double.valueOf(amount));
+		loan.setCurrentIncome(Double.valueOf(income));
+		loan.setRepaymentTerm(term);
+		ArrayList<MicroLoan> existingLoan = customer.getLoans();
+		if(existingLoan == null){
+			ArrayList<MicroLoan> newLoan  = new ArrayList<>();
+			newLoan.add(loan);
+			customer.setLoans(newLoan);
+		}else {
+			existingLoan.add(loan);
+			customer.setLoans(existingLoan);
+
+		}
+		return "LOAN GRANTED";
+	}
+
+	private String registerLender(Customer customer, String lender){
+		customer.setLender(lender);
+		return "SUCCESS";
+	}
+
+	private String showMicroLenders(){
+		String s = "";
+		for(Customer map: customers.values()){
+
+			s += map.getLender();
+		}
+		return s;
 	}
 
 	private String openAccount(CustomerID customer, String accountName) {
@@ -118,6 +176,6 @@ public class NewBank {
 				}
 			}
 		}
-		return "FAIL12";
+		return "FAIL";
 	}
 }

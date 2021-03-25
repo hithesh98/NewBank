@@ -17,3 +17,11 @@ Returns SUCCESS or FAIL
 PAY <Person/Company> <Amount> <FromAccount> <ToAccount> <DebitBank> <CreditBank>
 e.g. PAY John 100 Main Savings bank3 bank1
 Returns SUCCESS or FAIL
+
+BORROWMICROLOAN <LENDER> <Amount> <Income> <Term>
+eg:BORROWMICROLOAN lender1 123 12 2
+Returns LOAN GRANTED/FAIL
+
+REGISTERLENDER <LENDER>
+eg:REGISTERLENDER lender1
+Returns SUCCESS or FAIL
