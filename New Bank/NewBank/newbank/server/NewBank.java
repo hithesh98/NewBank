@@ -44,7 +44,6 @@ public class NewBank {
 			if (request.startsWith("LOGOFF")){
 				return "LOGOFF";
 			}
-
 			if (request.startsWith("NEWACCOUNT")){
 				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
 			}
