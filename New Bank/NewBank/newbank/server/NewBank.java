@@ -3,9 +3,9 @@ package newbank.server;
 import java.util.HashMap;
 
 public class NewBank {
-	
+
 	private static final NewBank bank = new NewBank();
-	private HashMap<String,Customer> customers;
+	private HashMap<String, Customer> customers;
 
 	private NewBank() {
 		customers = new HashMap<>();
@@ -16,25 +16,52 @@ public class NewBank {
 		Customer bhagy = new Customer();
 		bhagy.addAccount(new Account("Main", 1000.0));
 		customers.put("Bhagy", bhagy);
-		
+
 		Customer christina = new Customer();
 		christina.addAccount(new Account("Savings", 1500.0));
 		customers.put("Christina", christina);
-		
+
 		Customer john = new Customer();
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put("John", john);
 	}
-	
+
 	public static NewBank getBank() {
 		return bank;
 	}
-	
+
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
-		if(customers.containsKey(userName)) {
+		if (customers.containsKey(userName)) {
 			return new CustomerID(userName);
 		}
 		return null;
+	}
+
+	// login and signup initial requests
+	public synchronized String processRequest(String request) {
+		String[] input = request.split(" "); // create an array of the parsed input string
+		if(input[0].equals("LOGIN")) {
+			return "SUCCESS";
+		} else if (input[0].equals("SIGNUP")){
+			if(input.length < 3){
+				return "FAIL";
+			}
+			String name = input[1];
+			if(customers.containsKey(name)){
+				return "FAIL";
+			}
+			double initialDeposit = Double.parseDouble(input[2]);
+			return signUp(name, initialDeposit);
+		} else {
+			return "FAIL";
+		}
+	}
+
+	private String signUp(String name, double initialDeposit) {
+		Customer newCustomer = new Customer();
+		newCustomer.addAccount(new Account("Main", initialDeposit));
+		customers.put(name, newCustomer);
+		return "SUCCESS";
 	}
 
 	// commands from the NewBank customer are processed in this method

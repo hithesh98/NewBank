@@ -22,6 +22,17 @@ public class NewBankClientHandler extends Thread{
 	public void run() {
 		// keep getting requests from the client and processing them
 		try {
+			String responce = "FAIL"; // initialise responce string
+			while (responce!="SUCCESS"){ // while loop until success is achieved, will not bring up login entry until then
+				// ask if login or signup
+				out.println("LOGIN or SIGNUP");
+				String request = in.readLine();
+				responce = bank.processRequest(request);
+				out.println(responce);
+			}
+		} catch (IOException | NumberFormatException e) {
+			e.printStackTrace();
+		} try {
 			// ask for user name
 			out.println("Enter Username");
 			String userName = in.readLine();
@@ -31,7 +42,7 @@ public class NewBankClientHandler extends Thread{
 			out.println("Checking Details...");
 			// authenticate user and get customer ID token from bank for use in subsequent requests
 			CustomerID customer = bank.checkLogInDetails(userName, password);
-			// if the user is authenticated then get requests from the user and process them 
+			// if the user is authenticated then get requests from the user and process them
 			if(customer != null) {
 				out.println("Log In Successful. What do you want to do?");
 				while(true) {
@@ -39,24 +50,6 @@ public class NewBankClientHandler extends Thread{
 					System.out.println("Request from " + customer.getKey());
 					String responce = bank.processRequest(customer, request);
 					out.println(responce);
-					if(responce=="LOGOFF"){
-						// ask for user name
-						out.println("Enter Username");
-						userName = in.readLine();
-						// ask for password
-						out.println("Enter Password");
-						password = in.readLine();
-						out.println("Checking Details...");
-						// authenticate user and get customer ID token from bank for use in subsequent requests
-						customer = bank.checkLogInDetails(userName, password);
-						// if the user is authenticated then get requests from the user and process them 
-						if(customer != null) {
-						out.println("Log In Successful. What do you want to do?");
-						}
-						else{
-							break;
-						}
-					}
 				}
 			}
 			else {
