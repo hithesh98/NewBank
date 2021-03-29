@@ -11,9 +11,9 @@ import java.util.HashMap;
 
 
 public class NewBank {
-	
+
 	private static final NewBank bank = new NewBank();
-	private HashMap<String,Customer> customers;
+	private HashMap<String, Customer> customers;
 
 	private static String userDetails = "";
 
@@ -63,24 +63,53 @@ public class NewBank {
 			count += 1;
 		}
 		customers.put(data[0], user);
-		
 	}
-	
+
 	public static NewBank getBank() {
 		return bank;
 	}
-	
+
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
-		if(customers.containsKey(userName)) {
+		if (customers.containsKey(userName)) {
 			return new CustomerID(userName);
 		}
 		return null;
+	}
+
+	// login and signup initial requests
+	public synchronized String processRequest(String request) {
+		String[] input = request.split(" "); // create an array of the parsed input string
+		if(input[0].equals("LOGIN")) {
+			return "SUCCESS";
+		} else if (input[0].equals("SIGNUP")){
+			if(input.length < 3){
+				return "FAIL";
+			}
+			String name = input[1];
+			if(customers.containsKey(name)){
+				return "FAIL";
+			}
+			double initialDeposit = Double.parseDouble(input[2]);
+			return signUp(name, initialDeposit);
+		} else {
+			return "FAIL";
+		}
+	}
+
+	private String signUp(String name, double initialDeposit) {
+		Customer newCustomer = new Customer();
+		newCustomer.addAccount(new Account("Main", initialDeposit));
+		customers.put(name, newCustomer);
+		return "SUCCESS";
 	}
 
 	// commands from the NewBank customer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
 			String[] input = request.split(" "); // create an array of the parsed input string
+			if (request.startsWith("LOGOFF")){
+				return "LOGOFF";
+			}
 			if (request.startsWith("NEWACCOUNT")){
 				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
 			}
