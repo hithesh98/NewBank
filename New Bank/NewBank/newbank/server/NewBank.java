@@ -37,7 +37,7 @@ public class NewBank {
 		return null;
 	}
 
-	// login and signup initial requests
+	// login, signup, and logoff initial requests
 	public synchronized String processRequest(String request) {
 		String[] input = request.split(" "); // create an array of the parsed input string
 		if(input[0].equals("LOGIN")) {
@@ -55,6 +55,9 @@ public class NewBank {
 		} else {
 			return "FAIL";
 		}
+		if (request.startsWith("LOGOFF")){
+			return "LOGOFF";
+		}
 	}
 
 	private String signUp(String name, double initialDeposit) {
@@ -68,9 +71,6 @@ public class NewBank {
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
 			String[] input = request.split(" "); // create an array of the parsed input string
-			if (request.startsWith("LOGOFF")){
-				return "LOGOFF";
-			}
 			if (request.startsWith("NEWACCOUNT")){
 				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
 			}
