@@ -55,9 +55,7 @@ public class NewBank {
 		} else {
 			return "FAIL";
 		}
-		if (request.startsWith("LOGOFF")){
-			return "LOGOFF";
-		}
+
 	}
 
 	private String signUp(String name, double initialDeposit) {
@@ -83,11 +81,15 @@ public class NewBank {
 				String to = input[3];
 				return moveFunds(customer,amount,from,to);
 			}
+			if (input[0].equals("LOGOFF")){
+				return "LOGOFF";
+			}
 			switch(request) {
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
 			default : return "FAIL";
 			}
 		}
+
 		return "FAIL";
 	}
 

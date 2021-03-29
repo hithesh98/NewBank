@@ -11,28 +11,22 @@ public class NewBankClientHandler extends Thread{
 	private NewBank bank;
 	private BufferedReader in;
 	private PrintWriter out;
+	private Boolean loggedIn;
 	
 	
 	public NewBankClientHandler(Socket s) throws IOException {
 		bank = NewBank.getBank();
 		in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 		out = new PrintWriter(s.getOutputStream(), true);
+		loggedIn = false;
 	}
 	
 	public void run() {
 		// keep getting requests from the client and processing them
+		while(!loggedIn) {
+			loggedIn = loggedIn();
+		}
 		try {
-			String responce = "FAIL"; // initialise responce string
-			while (responce!="SUCCESS"){ // while loop until success is achieved, will not bring up login entry until then
-				// ask if login or signup
-				out.println("LOGIN or SIGNUP");
-				String request = in.readLine();
-				responce = bank.processRequest(request);
-				out.println(responce);
-			}
-		} catch (IOException | NumberFormatException e) {
-			e.printStackTrace();
-		} try {
 			// ask for user name
 			out.println("Enter Username");
 			String userName = in.readLine();
@@ -50,6 +44,10 @@ public class NewBankClientHandler extends Thread{
 					System.out.println("Request from " + customer.getKey());
 					String responce = bank.processRequest(customer, request);
 					out.println(responce);
+					if (responce.equals("LOGOFF")) {
+						loggedIn = false;
+						run();
+					}
 				}
 			}
 			else {
@@ -67,6 +65,23 @@ public class NewBankClientHandler extends Thread{
 				Thread.currentThread().interrupt();
 			}
 		}
+	}
+
+	public boolean loggedIn() {
+		try {
+			String responce = "FAIL"; // initialise responce string
+			while (responce!="SUCCESS"){ // while loop until success is achieved, will not bring up login entry until then
+				// ask if login or signup
+				out.println("LOGIN or SIGNUP");
+				String request = in.readLine();
+				responce = bank.processRequest(request);
+				out.println(responce);
+			}
+			return true;
+		} catch (IOException | NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 }
