@@ -1,5 +1,6 @@
 package newbank.server;
 
+
 import java.util.ArrayList;
 
 public class Customer {
@@ -19,8 +20,10 @@ public class Customer {
 	}
 
 	public void addAccount(Account account) {
-		accounts.add(account);		
+		accounts.add(account);	
 	}
+
+
 
 	public boolean editAccountBalance(String accountName, double amount) {
 		boolean accountExists = false;
