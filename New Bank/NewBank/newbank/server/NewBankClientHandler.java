@@ -42,9 +42,9 @@ public class NewBankClientHandler extends Thread{
 				while(true) {
 					String request = in.readLine();
 					System.out.println("Request from " + customer.getKey());
-					String responce = bank.processRequest(customer, request);
-					out.println(responce);
-					if (responce.equals("LOGOFF")) {
+					String response = bank.processRequest(customer, request);
+					out.println(response);
+					if (response.equals("LOGOFF")) {
 						loggedIn = false;
 						run();
 					}
@@ -69,13 +69,13 @@ public class NewBankClientHandler extends Thread{
 
 	public boolean loggedIn() {
 		try {
-			String responce = "FAIL"; // initialise responce string
-			while (responce!="SUCCESS"){ // while loop until success is achieved, will not bring up login entry until then
+			String response = "FAIL"; // initialise response string
+			while (response!="SUCCESS"){ // while loop until success is achieved, will not bring up login entry until then
 				// ask if login or signup
 				out.println("LOGIN or SIGNUP");
 				String request = in.readLine();
-				responce = bank.processRequest(request);
-				out.println(responce);
+				response = bank.processRequest(request);
+				out.println(response);
 			}
 			return true;
 		} catch (IOException | NumberFormatException e) {
