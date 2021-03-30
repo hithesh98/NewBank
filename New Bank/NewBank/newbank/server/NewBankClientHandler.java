@@ -11,7 +11,6 @@ public class NewBankClientHandler extends Thread{
 	private NewBank bank;
 	private BufferedReader in;
 	private PrintWriter out;
-	public String un = "";
 	
 	public NewBankClientHandler(Socket s) throws IOException {
 		bank = NewBank.getBank();
@@ -69,8 +68,4 @@ public class NewBankClientHandler extends Thread{
 			}
 		}
 	}
-	public String getUn(){
-		return un;
-	}
-
 }
