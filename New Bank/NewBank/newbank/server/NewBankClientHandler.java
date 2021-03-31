@@ -13,7 +13,6 @@ public class NewBankClientHandler extends Thread{
 	private PrintWriter out;
 	private Boolean loggedIn;
 	
-	
 	public NewBankClientHandler(Socket s) throws IOException {
 		bank = NewBank.getBank();
 		in = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -34,6 +33,7 @@ public class NewBankClientHandler extends Thread{
 			out.println("Enter Password");
 			String password = in.readLine();
 			out.println("Checking Details...");
+			bank.fetchUserDetails(userName);
 			// authenticate user and get customer ID token from bank for use in subsequent requests
 			CustomerID customer = bank.checkLogInDetails(userName, password);
 			// if the user is authenticated then get requests from the user and process them
@@ -83,5 +83,4 @@ public class NewBankClientHandler extends Thread{
 		}
 		return false;
 	}
-
 }
