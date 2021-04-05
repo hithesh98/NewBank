@@ -76,6 +76,13 @@ public class NewBank {
 		return bank;
 	}
 
+	public synchronized boolean checkUser(String userName, String password){
+		if (userName.equals(accountusername) && (password.equals(accountpassword))){
+			return true;
+		}
+		return false;
+	}
+
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
 		if (userName.equals(accountusername) && (password.equals(accountpassword))) {
 			return new CustomerID(id);

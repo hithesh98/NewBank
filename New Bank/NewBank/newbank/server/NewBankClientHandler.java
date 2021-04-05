@@ -34,6 +34,10 @@ public class NewBankClientHandler extends Thread{
 			String password = in.readLine();
 			out.println("Checking Details...");
 			bank.fetchUserDetails(userName);
+			if(!bank.checkUser(userName, password)){
+				out.println("\nUser not recognized or wrong password! \nPlease try again.\n");
+				run();
+			}
 			// authenticate user and get customer ID token from bank for use in subsequent requests
 			CustomerID customer = bank.checkLogInDetails(userName, password);
 			// if the user is authenticated then get requests from the user and process them
