@@ -208,6 +208,78 @@ public class NewBank {
 		boolean b = newFile.delete();
 	}
 
+	private void editLedger(String search, String account, String stringAdd) {
+		String filepath = ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv";
+		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
+		File oldFile = new File(filepath);
+		File newFile = new File(tempFile);
+		
+
+		try {
+			// Write to a temperory file
+			FileWriter fw = new FileWriter(tempFile, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter pw = new PrintWriter(bw);
+			
+			// read the orginal data.csv file and searches for ID and appends value to the end
+			BufferedReader csvReader = new BufferedReader(new FileReader(filepath));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					String[] data = row.split(",");
+					if(data[0].equals(search)){
+						row = "";
+						for(int i = 0 ; i < data.length; i++){
+							if(data[i].equals(account)){
+								data[i + 1] = stringAdd;
+							}
+							if(i<data.length-1){
+								row += data[i] + ",";
+							} else {
+								row += data[i];
+							}
+						}
+					}
+					pw.println(row);
+				}
+			}
+			pw.flush();
+			pw.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		try {
+			// Overwrittes the original data.csv file
+			FileWriter fw2 = new FileWriter(filepath);
+			BufferedWriter bw2 = new BufferedWriter(fw2);
+			PrintWriter pw2 = new PrintWriter(bw2);
+			
+			// Copies all data from temporary file
+			BufferedReader csvReader = new BufferedReader(new FileReader(tempFile));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					pw2.println(row);
+				}
+			}
+			pw2.flush();
+			pw2.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		// deletes the temporary file
+		boolean b = newFile.delete();
+	}
+
+
 	private String showMyAccounts(CustomerID customer) {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
@@ -216,6 +288,10 @@ public class NewBank {
 		if(amount > 0) { // should never need to move a negative amount
 			if((customers.get(customer.getKey())).editAccountBalance(from,-amount)) { // try to remove amount
 				if((customers.get(customer.getKey())).editAccountBalance(to,amount)) { // try to add amount
+					String fromBalance = customers.get(customer.getKey()).getBalance(from);
+					String toBalance = customers.get(customer.getKey()).getBalance(to);
+					editLedger(customer.getKey(), from, fromBalance);
+					editLedger(customer.getKey(), to, toBalance);
 					return "SUCCESS";
 				} else { // if adding was unsuccessful, add it back to the original account
 					(customers.get(customer.getKey())).editAccountBalance(from,amount);
