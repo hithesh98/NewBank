@@ -14,8 +14,10 @@ public class NewBank {
 
 	private static final NewBank bank = new NewBank();
 	private HashMap<String, Customer> customers;
-
 	private static String userDetails = "";
+	private static String accountusername = "";
+	private static String accountpassword= "";
+	private static String id= "";
 
 	private NewBank() {
 		customers = new HashMap<>();
@@ -49,7 +51,12 @@ public class NewBank {
 	}
 
 	public void fetchUserDetails(String username){
-		readData(username, ".\\New Bank\\NewBank\\newbank\\server\\data.csv");
+		readData(username, ".\\New Bank\\NewBank\\newbank\\server\\users.csv");
+		String user[] = userDetails.split(",");
+		id = user[user.length-1];
+		accountusername = user[0];
+		accountpassword = user[1];
+		readData(id, ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv");
 		addTestData();
 	}
 
@@ -70,8 +77,8 @@ public class NewBank {
 	}
 
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
-		if (customers.containsKey(userName)) {
-			return new CustomerID(userName);
+		if (userName.equals(accountusername) && (password.equals(accountpassword))) {
+			return new CustomerID(id);
 		}
 		return null;
 	}
@@ -141,7 +148,7 @@ public class NewBank {
 
 	// Appends to a value to the end of a record by searching for an id
 	private void editEnd(String search, String stringAdd) {
-		String filepath = ".\\New Bank\\NewBank\\newbank\\server\\data.csv";
+		String filepath = ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv";
 		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
 		File oldFile = new File(filepath);
 		File newFile = new File(tempFile);
