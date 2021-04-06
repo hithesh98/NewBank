@@ -1,13 +1,8 @@
 package newbank.server;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.HashMap;
-
+import java.util.Random;
 
 
 public class NewBank {
@@ -96,25 +91,40 @@ public class NewBank {
 		if(input[0].equals("LOGIN")) {
 			return "SUCCESS";
 		} else if (input[0].equals("SIGNUP")){
-			if(input.length < 3){
+			if(input.length < 4){
 				return "FAIL";
 			}
 			String name = input[1];
 			if(customers.containsKey(name)){
 				return "FAIL";
 			}
-			double initialDeposit = Double.parseDouble(input[2]);
-			return signUp(name, initialDeposit);
-		} else {
-			return "FAIL";
+			//Random 7 digit number for the customers ID
+			Random customerID = new Random();
+			int num = customerID.nextInt(9000000) + 1000000;
+			String num1 = String.valueOf(num);
+			//Writing to the next line on users.csv
+			try (FileWriter fw = new FileWriter(".\\New Bank\\NewBank\\newbank\\server\\users.csv", true)) {
+				fw.append("\n");
+				fw.append(input[1]);
+				fw.append(",");
+				fw.append(input[2]);
+				fw.append(",");
+				fw.append(num1);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try (FileWriter fw1 = new FileWriter(".\\New Bank\\NewBank\\newbank\\server\\ledger.csv", true)) {
+				fw1.append("\n");
+				fw1.append(num1);
+				fw1.append(",");
+				fw1.append("Main");
+				fw1.append(",");
+				fw1.append(input[3]);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-
-	}
-
-	private String signUp(String name, double initialDeposit) {
-		Customer newCustomer = new Customer();
-		newCustomer.addAccount(new Account("Main", initialDeposit));
-		customers.put(name, newCustomer);
 		return "SUCCESS";
 	}
 
