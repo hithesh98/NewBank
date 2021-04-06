@@ -45,4 +45,13 @@ public class Customer {
 		}
 		return false;
 	}
+	public String getBalance(String accountName){
+		String balance = "";
+		for (Account a : accounts) { // Search for account with the matching name
+			if (a.getAccountName().equals(accountName)) {
+				balance = Double.toString(a.getOpeningBalance());	
+			}
+		}
+		return balance;
+	}
 }
