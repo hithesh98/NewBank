@@ -16,7 +16,7 @@ public class NewBank {
 	private void addTestData() {
 
 		Customer bhagy = new Customer();
-		bhagy.setLender("bhagy lender");
+		bhagy.setLender("Microlender1");
 
 		bhagy.addAccount(new Account("Main", 1000.0));
 		customers.put("Bhagy", bhagy);
@@ -47,7 +47,7 @@ public class NewBank {
 		return null;
 	}
 
-	// commands from the NewBank cusbtomer are processed in this method
+	// commands from the NewBank customer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request){
 		if(customers.containsKey(customer.getKey())) {
 			String[] input = request.split(" "); // create an array of the parsed input string
@@ -55,7 +55,7 @@ public class NewBank {
 				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
 			}
 			if (request.startsWith("REGISTERLENDER")){
-				if(input.length < 1) { // return fail if not enough information is provided
+				if(input.length < 2) { // return fail if not enough information is provided
 					return "FAIL";
 				}
 				Customer cust = customers.get(customer.getKey());
