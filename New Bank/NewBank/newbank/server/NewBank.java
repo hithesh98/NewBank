@@ -132,8 +132,26 @@ public class NewBank {
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
 			String[] input = request.split(" "); // create an array of the parsed input string
-			if (request.startsWith("NEWACCOUNT")){
+			if(request.startsWith("NEWACCOUNT")){
 				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
+			}
+			if(request.startsWith("DEPOSIT")){
+				if(input.length != 2) { // return fail if wrong number of inputs
+					return "FAIL - wrong format";
+				}
+				try {
+					double depositAmount = Double.parseDouble(input[1]);
+					if((customers.get(customer.getKey())).editAccountBalance("Main",depositAmount)) { // try to add amount
+						//String fromBalance = customers.get(customer.getKey()).getBalance(from);
+						String toBalance = customers.get(customer.getKey()).getBalance("Main");
+						//editLedger(customer.getKey(), from, fromBalance);
+						editLedger(customer.getKey(), "Main", toBalance);
+						return "SUCCESS";
+					}
+				}	
+				catch (Exception e){
+					return "FAIL - please input number";
+				}
 			}
 			if(input[0].equals("MOVE")) {
 				if(input.length < 4) { // return fail if not enough information is provided
@@ -144,7 +162,7 @@ public class NewBank {
 				String to = input[3];
 				return moveFunds(customer,amount,from,to);
 			}
-			if (input[0].equals("LOGOFF")){
+			if(input[0].equals("LOGOFF")){
 				return "LOGOFF";
 			}
 			switch(request) {
