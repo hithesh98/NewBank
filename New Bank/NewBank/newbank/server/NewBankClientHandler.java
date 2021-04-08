@@ -33,8 +33,7 @@ public class NewBankClientHandler extends Thread{
 			out.println("Enter Password");
 			String password = in.readLine();
 			out.println("Checking Details...");
-			bank.fetchUserDetails(userName);
-			if(!bank.checkUser(userName, password)){
+			if(!bank.fetchUserDetails(userName)){
 				out.println("\nUser not recognized or wrong password! \nPlease try again.\n");
 				run();
 			}
