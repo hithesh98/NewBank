@@ -157,6 +157,7 @@ public class NewBank {
 			if (input[0].equals("LOGOFF")){
 				return "LOGOFF";
 			}
+
 			if(input[0].equals("PAY")) {
 				if(input.length < 5) { // return fail if not enough information is provided
 					return "FAIL";
@@ -167,6 +168,7 @@ public class NewBank {
 				String toAccount = input[4];
 				return payment(customerId,amount,fromAccount,toAccount);
 				}
+
 			switch(request) {
 				case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
 				default : return "FAIL";
