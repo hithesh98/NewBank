@@ -2,6 +2,16 @@ This document details the protocol for interacting with the NewBank server.
 
 A customer enters the command below and sees the messages returned 
 
+LOGIN
+Allows user login, proceeds to entry of username and password
+Returns SUCCESS or FAIL
+
+SIGNUP <NAME> <PASSWORD> <INITIAL DEPOSIT>
+Allows new user to sign up and creates a main bank account with initial deposit,
+then continues to the login information
+e.g. SIGNUP Samantha pa55word 100
+Returns SUCCESS or FAIL
+
 SHOWMYACCOUNTS
 Returns a list of all the customers accounts along with their current balance 
 e.g. Main: 1000.0 
@@ -14,8 +24,8 @@ MOVE <Amount> <From> <To>
 e.g. MOVE 100 Main Savings 
 Returns SUCCESS or FAIL
 
-PAY <Person/Company> <Amount> <FromAccount> <ToAccount> <DebitBank> <CreditBank>
-e.g. PAY John 100 Main Savings bank3 bank1
+PAY <ID> <Amount> <FromAccount> <ToAccount> 
+e.g. PAY 4085078 30 Checking Main
 Returns SUCCESS or FAIL
 
 BORROWMICROLOAN <LENDER> <Amount> <Income> <Term>
@@ -28,4 +38,4 @@ Returns SUCCESS or FAIL
 
 SHOWMICROLENDERS
 eg: SHOWMICROLENDERS
-Returns LIST OF MICROLENDERS
+Returns LIST OF MICROLENDERS 
