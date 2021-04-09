@@ -16,6 +16,8 @@ Functional Requirements
 		FR1.4 An ID number shall consist of 8 digits.
 		
 		FR1.5 The system shall display an error message to users if name is already in use.
+
+		FR1.6 The default account shall be Main
 	
 	FR2	The system shall require users to login to use its features. (LOGIN)
 	
@@ -48,6 +50,8 @@ Functional Requirements
 		FR8.2 User shall not transfer more money than he has on his main account.
 
 	FR9	Register as a lender function – allows user to register as a lender for bank’s microloan service
+		FR9.1 The user must have the desired amount to loan in their main account
+
 
 	FR10	Show lender function – shows user a list of available micro-lenders
 

@@ -25,16 +25,6 @@ public class Customer {
 
 	private ArrayList<MicroLoan> loans;
 
-	public String getBankName() {
-		return bankName;
-	}
-
-	public void setBankName(String bankName) {
-		this.bankName = bankName;
-	}
-
-	private String bankName;
-
 	public String getLender() {
 		return lender;
 	}

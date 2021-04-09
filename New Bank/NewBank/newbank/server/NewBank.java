@@ -13,6 +13,9 @@ public class NewBank {
 	private static String accountusername = "";
 	private static String accountpassword= "";
 	private static String id= "";
+	private String ledger = ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv";
+	private String lender = ".\\New Bank\\NewBank\\newbank\\server\\lenders.csv";
+	
 
 	private NewBank() {
 		customers = new HashMap<>();
@@ -132,8 +135,7 @@ public class NewBank {
 				if(input.length < 2) { // return fail if not enough information is provided
 					return "FAIL";
 				}
-				Customer cust = customers.get(customer.getKey());
-				return registerLender(cust, input[1]);
+				return registerLender(input[1]);
 			}
 			if (request.startsWith("BORROWMICROLOAN")){
 				if(input.length < 4) { // return fail if not enough information is provided
@@ -204,9 +206,21 @@ public class NewBank {
 		return "LOAN GRANTED";
 	}
 
-	private String registerLender(Customer customer, String lender){
-		customer.setLender(lender);
-		return "SUCCESS";
+	private String registerLender(String loanAmount){
+		Double amount = Double.parseDouble(loanAmount);
+		Double balance = Double.parseDouble(customers.get(id).getBalance("Main"));
+		if(balance > amount){
+			String newBalance = Double.toString(balance - amount);
+			String record = id + "," + loanAmount;
+			if(addRecord(id, record, lender)){
+				customers.get(id).editAccountBalance("Main", -amount);
+				editLedger(id,"Main", newBalance, ledger);
+				return "REGISTERED AS A LENDER";
+			} else {
+				return "ALREADY REGISTERED AS A LENDER";
+			}
+		}
+		return "FAIL";
 	}
 
 	private String showMicroLenders(){
@@ -287,8 +301,8 @@ public class NewBank {
 		boolean b = newFile.delete();
 	}
 
-	private void editLedger(String search, String account, String stringAdd) {
-		String filepath = ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv";
+	private void editLedger(String search, String account, String stringAdd, String path) {
+		String filepath = path;
 		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
 		File oldFile = new File(filepath);
 		File newFile = new File(tempFile);
@@ -358,7 +372,6 @@ public class NewBank {
 		boolean b = newFile.delete();
 	}
 
-
 	private String showMyAccounts(CustomerID customer) {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
@@ -369,8 +382,8 @@ public class NewBank {
 				if((customers.get(customer.getKey())).editAccountBalance(to,amount)) { // try to add amount
 					String fromBalance = customers.get(customer.getKey()).getBalance(from);
 					String toBalance = customers.get(customer.getKey()).getBalance(to);
-					editLedger(customer.getKey(), from, fromBalance);
-					editLedger(customer.getKey(), to, toBalance);
+					editLedger(customer.getKey(), from, fromBalance, ledger);
+					editLedger(customer.getKey(), to, toBalance, ledger);
 					return "SUCCESS";
 				} else { // if adding was unsuccessful, add it back to the original account
 					(customers.get(customer.getKey())).editAccountBalance(from,amount);
@@ -385,7 +398,7 @@ public class NewBank {
 			if(customers.get(id).editAccountBalance(from,-amount)) { // try to remove amount
 				if(transfer(toID, to, amount)) { // try to add amount
 					String fromBalance = customers.get(id).getBalance(from);
-					editLedger(id, from, fromBalance);
+					editLedger(id, from, fromBalance, ledger);
 					return "SUCCESS";
 				} else { // if adding was unsuccessful, add it back to the original account
 					customers.get(id).editAccountBalance(from,amount);
@@ -433,6 +446,76 @@ public class NewBank {
 						}
 					}
 					pw.println(row);
+				}
+			}
+			pw.flush();
+			pw.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		try {
+			// Overwrittes the original data.csv file
+			FileWriter fw2 = new FileWriter(filepath);
+			BufferedWriter bw2 = new BufferedWriter(fw2);
+			PrintWriter pw2 = new PrintWriter(bw2);
+			
+			// Copies all data from temporary file
+			BufferedReader csvReader = new BufferedReader(new FileReader(tempFile));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					pw2.println(row);
+				}
+			}
+			pw2.flush();
+			pw2.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		// deletes the temporary file
+		boolean b = newFile.delete();
+		return result;
+	}
+
+	private boolean addRecord(String search, String stringAdd, String path) {
+		boolean result = true;
+		String filepath = path;
+		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
+		File oldFile = new File(filepath);
+		File newFile = new File(tempFile);
+		
+
+		try {
+			// Write to a temperory file
+			FileWriter fw = new FileWriter(tempFile, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter pw = new PrintWriter(bw);
+			
+			// read the orginal data.csv file and searches for ID and appends value to the end
+			BufferedReader csvReader = new BufferedReader(new FileReader(filepath));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null && result != false){
+					String[] data = row.split(",");
+					if(data[0].equals(search)){
+						result = false;
+						pw.println(row);
+						break;
+					}
+					pw.println(row);
+				} else {
+					row = stringAdd;
+					pw.println(row);
+					result = true;
+					break;
 				}
 			}
 			pw.flush();
