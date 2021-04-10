@@ -138,22 +138,44 @@ public class NewBank {
 			if(request.startsWith("NEWACCOUNT")){
 				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
 			}
+
+			// Deposit functionality
 			if(request.startsWith("DEPOSIT")){
 				if(input.length != 2) { // return fail if wrong number of inputs
-					return "FAIL - wrong format";
+					return "Please input correct format";
 				}
-				try {
+				try { // check if amount is correct
 					double depositAmount = Double.parseDouble(input[1]);
 					if((customers.get(customer.getKey())).editAccountBalance("Main",depositAmount)) { // try to add amount
-						//String fromBalance = customers.get(customer.getKey()).getBalance(from);
 						String toBalance = customers.get(customer.getKey()).getBalance("Main");
-						//editLedger(customer.getKey(), from, fromBalance);
 						editLedger(customer.getKey(), "Main", toBalance);
-						return "SUCCESS";
+						return "Deposit of " + String.format("%.2f",depositAmount) + " accepted";
 					}
 				}	
 				catch (Exception e){
-					return "FAIL - please input number";
+					return "Please input correct amount";
+				}
+			}
+			
+			// Withdraw functionality
+			if(request.startsWith("WITHDRAW")){
+				if(input.length != 2) { // return fail if wrong number of inputs
+					return "Please input correct format";
+				}
+				try { // check if amount is correct
+					double withdrawAmount = Double.parseDouble(input[1]);
+					if((customers.get(customer.getKey())).editAccountBalance("Main",-withdrawAmount)) { // try to withdraw amount
+						String toBalance = customers.get(customer.getKey()).getBalance("Main");
+						editLedger(customer.getKey(), "Main", toBalance);
+						return "Withdraw of " + String.format("%.2f",withdrawAmount) + " successful";
+					}
+					else {
+						return "Not sufficient balance on the Main account";
+				
+					}
+				}	
+				catch (Exception e){
+					return "Please input correct amount";
 				}
 			if (request.startsWith("REGISTERLENDER")){
 				if(input.length < 2) { // return fail if not enough information is provided
@@ -172,6 +194,10 @@ public class NewBank {
 			if (request.startsWith("SHOWMICROLENDERS")){
 				return showMicroLenders(); // +1 to remove the leading space
 			}
+
+
+
+
 			if(input[0].equals("MOVE")) {
 				if(input.length < 4) { // return fail if not enough information is provided
 					return "FAIL";
