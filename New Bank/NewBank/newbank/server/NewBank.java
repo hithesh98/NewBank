@@ -127,9 +127,8 @@ public class NewBank {
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-			return "SUCCESS";
 		}
-		return "FAIL";
+		return "SUCCESS";
 	}
 
 	// commands from the NewBank customer are processed in this method
