@@ -184,14 +184,11 @@ public class NewBank {
 	}
 
 	private String borrowMicroLoan(Customer customer, String lender, String amount, String income, String term){
-		Set<String> str = new HashSet<>();
-		for(Customer map: customers.values()){
-
-			str.add(map.getLender());
-		}
-		if(!str.contains(lender)){
+		String lenders = readLenders();
+		if(!lenders.contains(lender)){
 			return  "INVALID LENDER";
 		}
+
 		MicroLoan loan = new MicroLoan();
 		loan.setAmount(Double.valueOf(amount));
 		loan.setCurrentIncome(Double.valueOf(income));
