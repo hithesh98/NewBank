@@ -13,29 +13,29 @@ Functional Requirements
 		
 		FR1.3 An account shall have an ID number.
 		
-		FR1.4 An ID number shall consist of 8 digits.
+		FR1.4 An ID number shall consist of 7 digits.
 		
 		FR1.5 The system shall display an error message to users if name is already in use.
-
-		FR1.6 The default account shall be Main
+		
+		FR1.6 The system shall add "Main" account as defualt.
 	
 	FR2	The system shall require users to login to use its features. (LOGIN)
 	
 		FR2.1 User shall have 3 attempts to login.
+		
+		FR2.2 After 3 attempts the system shall block the user account.
 
 	FR3	The system shall allow users to change their password. (PASSWORDCHANGE)
 
 	FR4	User shall be able to check its accounts balance. (SHOWMYACCOUNTS)
-		
-		FR4.1 User shall be able to check transactions' history. (HISTORY)
 
 	FR5	User shall be able to deposit money. (DEPOSIT)
 
-		FR5.1 User shall deposit money on its main account.
+		FR5.1 User shall deposit money on its "Main" account.
 		
 	FR6	User shall be able to withdraw money. (WITHDRAW)
 	
-		FR6.1 User shall withdraw money from its main account.
+		FR6.1 User shall withdraw money from its "Main" account.
 		
 		FR6.2. User shall not withdraw more money that he has on his main account.
 
@@ -45,9 +45,9 @@ Functional Requirements
 
 	FR8	User shall be able to transfer money from his account to other user's account. (PAY)
 	
-		FR8.1 Pay function shall move money from main acocunt to main account.
+		FR8.1 Pay function shall move money from user "Main" account to destination user "Main" account.
 		
-		FR8.2 User shall not transfer more money than he has on his main account.
+		FR8.2 User shall not transfer more money than he has on his "Main" account.
 
 	FR9	Register as a lender function – allows user to register as a lender for bank’s microloan service
 		FR9.1 The user must have the desired amount to loan in their main account
@@ -59,34 +59,28 @@ Functional Requirements
 
 	FR12	Show loans – show the user current outstanding loans
 
-	FR13	Logout function – allows user to log out of account
+	FR13	User shall be able to log out of the system. (LOGOFF)
 	
-		FR13.1	User should be able to log off using "LOGOFF" function.
+		FR13.1 User should be able to log off using "LOGOFF" function.
 		
-		FR13.2	After using "LOGOFF" function program should ask for User Name again.
+		FR13.2 After using "LOGOFF" function program should ask for User Name again.
 
 
 Non-Functional Requirements
 
-	NFR1	Security requirements
-		NFR1.1	Account ID, PIN and Password protection happens at the first level within the system. To access internet banking, users are required to insert account ID and password. Without these, access denied. Special password characters may be imposed by the Bank to provide a greater degree of security. The following characters may be used as required :!@#$%^&*()_+-=[]{}|\;:’”, /? 
-
-		NFR1.2	Auto Timeout Screen Blanking – 5 minutes of inactivity then time-out. The auto timeout feature warns users every 30 seconds prior to a pending timeout. 
-
-		NRE1.3	Sign-off Button – user has the option to sign off after they have finished using the app. 
-
-		NFR1.4	Failed login attempts -  users are denied access after a pre-determined number of failed log-on attempts. If users have been locked out due to exceeding the pre-determined number of log-on attempts, the users must contact the Bank in order to be reinitialized. 
-				
-		NFR1.5	Encryption In addition to password protection.
-
-	NFR2	Performance requirements
+	NFR1	Users' passwords shall be secure.
+		
+		NFR1.1 Passwords should be hashed using secure algorithm.
 	
-		NFR2.1	Increase customer satisfaction by allowing customers to access banking services 24/7, 365 days a year with minimum downtime period for backup and maintenance
-
-		NFR2.2	Expand services and products by providing facilities for NewBank to offer new services and products onto its homepage. 
-				
-		NFR2.3	Reduce costs by minimising costs of processing transactions and reduce the number of branches required to service an equivalent number of customer. 
-
-	NFR3	Safety requirements
+	NFR2 	The system should be reliable.
 	
-		NFR3.1	Ensure back up, recovery and business continuity by ensuring sufficient back up of data in accordance to rules and regulations. Back up should be done periodically. 
+		NFR2.1 The system should be available at least 23 hours a day.
+		
+		NFR2.2 Any downtime to the system should be limited to the hours betweeen 00:00 and 06:00.
+		
+	NFR3	The system shall be secure.
+	
+		NFR3.1 The system back up should be done at least one per day.
+		
+		NFR3.2 After 3 failed attempts to login, the system shall freeze the account.
+

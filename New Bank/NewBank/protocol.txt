@@ -20,6 +20,20 @@ NEWACCOUNT <Name>
 e.g. NEWACCOUNT Savings
 Returns SUCCESS or FAIL
 
+DEPOSIT <Amount>
+Allows user to deposit money on his Main account
+e.g. DEPOSIT 100
+Returns Deposit of <Amount> accepted
+or Please input correct format
+or Please input correct amount
+
+WITHDRAW <Amount>
+Allows user to withdraw money from his Main account
+e.g. WITHDRAW 100
+Returns Withdraw of <Amount> successful
+or Please input correct format
+or Not sufficient balance on the Main account
+
 MOVE <Amount> <From> <To>
 e.g. MOVE 100 Main Savings 
 Returns SUCCESS or FAIL
