@@ -127,8 +127,9 @@ public class NewBank {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			return "SUCCESS";
 		}
-		return "SUCCESS";
+		return"FAIL";
 	}
 
 	// commands from the NewBank customer are processed in this method
@@ -174,6 +175,7 @@ public class NewBank {
 				} catch (Exception e) {
 					return "Please input correct amount";
 				}
+			}
 				if (request.startsWith("REGISTERLENDER")) {
 					if (input.length < 2) { // return fail if not enough information is provided
 						return "FAIL";
@@ -227,7 +229,6 @@ public class NewBank {
 
 			return "FAIL";
 		}
-	}
 
 		private String borrowMicroLoan (Customer customer, String lender, String amount, String income, String term){
 			Set<String> str = new HashSet<>();
@@ -522,4 +523,3 @@ public class NewBank {
 			return result;
 		}
 	}
-}
