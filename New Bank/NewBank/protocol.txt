@@ -20,10 +20,36 @@ NEWACCOUNT <Name>
 e.g. NEWACCOUNT Savings
 Returns SUCCESS or FAIL
 
+DEPOSIT <Amount>
+Allows user to deposit money on his Main account
+e.g. DEPOSIT 100
+Returns Deposit of <Amount> accepted
+or Please input correct format
+or Please input correct amount
+
+WITHDRAW <Amount>
+Allows user to withdraw money from his Main account
+e.g. WITHDRAW 100
+Returns Withdraw of <Amount> successful
+or Please input correct format
+or Not sufficient balance on the Main account
+
 MOVE <Amount> <From> <To>
 e.g. MOVE 100 Main Savings 
 Returns SUCCESS or FAIL
 
-PAY <Person/Company> <Ammount>
-e.g. PAY John 100
+PAY <ID> <Amount> <FromAccount> <ToAccount> 
+e.g. PAY 4085078 30 Checking Main
 Returns SUCCESS or FAIL
+
+BORROWMICROLOAN <LENDER> <Amount> <Income> <Term>
+eg:BORROWMICROLOAN Microlender1 123 12 2
+Returns LOAN GRANTED/FAIL
+
+REGISTERLENDER <LENDER>
+eg:REGISTERLENDER Microlender14
+Returns SUCCESS or FAIL
+
+SHOWMICROLENDERS
+eg: SHOWMICROLENDERS
+Returns LIST OF MICROLENDERS 
