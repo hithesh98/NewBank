@@ -38,6 +38,18 @@ MOVE <Amount> <From> <To>
 e.g. MOVE 100 Main Savings 
 Returns SUCCESS or FAIL
 
-PAY <Person/Company> <Ammount>
-e.g. PAY John 100
+PAY <ID> <Amount> <FromAccount> <ToAccount> 
+e.g. PAY 4085078 30 Checking Main
 Returns SUCCESS or FAIL
+
+BORROWMICROLOAN <LENDER> <Amount> <Income> <Term>
+eg:BORROWMICROLOAN Microlender1 123 12 2
+Returns LOAN GRANTED/FAIL
+
+REGISTERLENDER <LENDER>
+eg:REGISTERLENDER Microlender14
+Returns SUCCESS or FAIL
+
+SHOWMICROLENDERS
+eg: SHOWMICROLENDERS
+Returns LIST OF MICROLENDERS 
