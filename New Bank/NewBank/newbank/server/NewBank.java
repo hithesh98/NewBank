@@ -3,6 +3,9 @@ package newbank.server;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Random;
+
+import javax.naming.spi.DirStateFactory.Result;
+
 import java.util.*;
 
 public class NewBank {
@@ -145,7 +148,7 @@ public class NewBank {
 				return borrowMicroLoan(cust, input[1], input[2], input[3], input[4]);
 			}
 			if (request.startsWith("SHOWMICROLENDERS")){
-				return showMicroLenders(); // +1 to remove the leading space
+				return readLenders(); // +1 to remove the leading space
 			}
 			if(input[0].equals("MOVE")) {
 				if(input.length < 4) { // return fail if not enough information is provided
@@ -221,15 +224,6 @@ public class NewBank {
 			}
 		}
 		return "FAIL";
-	}
-
-	private String showMicroLenders(){
-		String s = "";
-		for(Customer map: customers.values()){
-
-			s += map.getLender();
-		}
-		return s;
 	}
 
 	private String openAccount(CustomerID customer, String accountName) {
@@ -551,6 +545,32 @@ public class NewBank {
 		}
 		// deletes the temporary file
 		boolean b = newFile.delete();
+		return result;
+	}
+
+	private String readLenders(){
+		String result = "";
+		try {
+
+			BufferedReader csvReader = new BufferedReader(new FileReader(lender));
+			String row = "placeholder";
+			int count = 0;
+			while (row!= null) {
+				row = csvReader.readLine();
+				String[] data = row.split(",");
+				if (count == 0){
+					result += "\n" + data[0] + "\t" + "\t" + data[1];
+				}
+				if(count > 0){
+					result += "\n" + data[0] + "\t" + "\t"  + "\t" + data[1];
+				}
+				count += 1;
+			}
+			csvReader.close();
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();;
+		}
 		return result;
 	}
 }
