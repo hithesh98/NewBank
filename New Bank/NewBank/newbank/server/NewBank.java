@@ -45,14 +45,24 @@ public class NewBank {
 		return "User not found";
 	}
 
-	public void fetchUserDetails(String username){
-		readData(username, ".\\New Bank\\NewBank\\newbank\\server\\users.csv");
-		String user[] = userDetails.split(",");
-		id = user[user.length-1];
-		accountusername = user[0];
-		accountpassword = user[1];
-		readData(id, ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv");
-		addTestData();
+	public Boolean fetchUserDetails(String username, String password){
+		try {
+			readData(username, ".\\New Bank\\NewBank\\newbank\\server\\users.csv");
+			String user[] = userDetails.split(",");
+			id = user[user.length-1];
+			accountusername = user[0];
+			accountpassword = user[1];
+			readData(id, ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv");
+			addTestData();
+			if(password.equals(accountpassword)){
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			//TODO: handle exception
+			return false;
+		}
 	}
 
 	private void addTestData() {

@@ -33,7 +33,7 @@ public class NewBankClientHandler extends Thread{
 			out.println("Enter Password");
 			String password = in.readLine();
 			out.println("Checking Details...");
-			bank.fetchUserDetails(userName);
+			if(!bank.fetchUserDetails(userName, password)){
 			// authenticate user and get customer ID token from bank for use in subsequent requests
 			CustomerID customer = bank.checkLogInDetails(userName, password);
 			if(customer == null){
