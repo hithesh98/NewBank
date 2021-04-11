@@ -19,6 +19,7 @@ public class NewBank {
 	private String lender = ".\\New Bank\\NewBank\\newbank\\server\\lenders.csv";
 	private static String id = "";
 	private String algorithm = "SHA-256";
+	private final int MAX_LOGIN_ATTEMPTS = 3;
 	
 
 	private NewBank() {
@@ -53,24 +54,30 @@ public class NewBank {
 		return "User not found";
 	}
 
-	public Boolean fetchUserDetails(String username, String password) {
+	public int fetchUserDetails(String username, String password) {
 		try {
 			readData(username, users,2);
 			String user[] = userDetails.split(",");
 			id = user[0];
 			accountusername = user[1];
 			accountpassword = user[2];
+			int loginAttempts = Integer.parseInt(user[3]);
+			if(loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+				return 2; // fail, too many failed login attempts
+			}
 			readData(id, ledger,1);
 			addTestData();
 			String newPass = generateHash(password, algorithm);
 			if (newPass.equals(accountpassword)) {
-				return true;
+				changeCSVValue(id,"0",4,users); // reset login attempts counter
+				return 0; // success
 			} else {
-				return false;
+				changeCSVValue(id,String.valueOf(loginAttempts+1),4,users);
+				return 1; // fail, no username/password match
 			}
 		} catch (Exception e) {
 			//TODO: handle exception
-			return false;
+			return -1; //undefined error
 		}
 	}
 
@@ -136,6 +143,8 @@ public class NewBank {
 				fw.append(input[1]);
 				fw.append(",");
 				fw.append(hashedPass);
+				fw.append(",");
+				fw.append("0"); // Failed login attempts
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -417,6 +426,77 @@ public class NewBank {
 		try {
 			// Overwrittes the original data.csv file
 			FileWriter fw2 = new FileWriter(filepath);
+			BufferedWriter bw2 = new BufferedWriter(fw2);
+			PrintWriter pw2 = new PrintWriter(bw2);
+
+			// Copies all data from temporary file
+			BufferedReader csvReader = new BufferedReader(new FileReader(tempFile));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					pw2.println(row);
+				}
+			}
+			pw2.flush();
+			pw2.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		// deletes the temporary file
+		boolean b = newFile.delete();
+	}
+
+	private void changeCSVValue(String id, String newValue, int col, String path) {
+		// 'id' should be the unique numeric account ID, 'col' (column) starts at 1
+		// method will change one CSV value. Indexed on ID and column number.
+		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
+		File oldFile = new File(path);
+		File newFile = new File(tempFile);
+
+		try {
+			// Write to a temporary file
+			FileWriter fw = new FileWriter(tempFile, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter pw = new PrintWriter(bw);
+
+			// read the original data.csv file and searches for ID and appends value to the end
+			BufferedReader csvReader = new BufferedReader(new FileReader(path));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					String[] data = row.split(",");
+					if(data[0].equals(id)){
+						row = "";
+						for(int i = 0 ; i < data.length; i++){
+							if(i == col-1){
+								data[i] = newValue;
+							}
+							if(i<data.length-1){
+								row += data[i] + ",";
+							} else {
+								row += data[i];
+							}
+						}
+					}
+					pw.println(row);
+				}
+			}
+			pw.flush();
+			pw.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		try {
+			// Overwrites the original data.csv file
+			FileWriter fw2 = new FileWriter(path);
 			BufferedWriter bw2 = new BufferedWriter(fw2);
 			PrintWriter pw2 = new PrintWriter(bw2);
 

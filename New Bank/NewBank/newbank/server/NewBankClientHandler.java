@@ -32,9 +32,16 @@ public class NewBankClientHandler extends Thread{
 			// ask for password
 			out.println("Enter Password");
 			String password = in.readLine();
-			out.println("Checking Details...\n");
-			if(!bank.fetchUserDetails(userName, password)){
-				out.println("\nUser not recognized or wrong password!!!\nPlease try again.\n");
+			out.println("Checking Details...");
+			int loginCode = bank.fetchUserDetails(userName, password);
+			if(loginCode == 1){
+				out.println("\nUser not recognized or wrong password! \nPlease try again.\n");
+				run();
+			} else if(loginCode == 2) {
+				out.println("\nToo many failed login attempts! \nPlease contact the bank.\n");
+				run();
+			} else if(loginCode == -1) {
+				out.println("\nUndefined error. \nPlease try again.\n");
 				run();
 			}
 			// authenticate user and get customer ID token from bank for use in subsequent requests
