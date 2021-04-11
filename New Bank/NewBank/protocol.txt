@@ -6,7 +6,7 @@ LOGIN
 Allows user login, proceeds to entry of username and password
 Returns SUCCESS or FAIL
 
-SIGNUP <NAME> <PASSWORD> <INITIAL DEPOSIT>
+SIGNUP <USERNAME> <PASSWORD> <INITIAL DEPOSIT>
 Allows new user to sign up and creates a main bank account with initial deposit,
 then continues to the login information
 e.g. SIGNUP Samantha pa55word 100
