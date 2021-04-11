@@ -14,6 +14,7 @@ public class NewBank {
 	private static String userDetails = "";
 	private static String accountusername = "";
 	private static String accountpassword = "";
+	private String users = ".\\New Bank\\NewBank\\newbank\\server\\users.csv";
 	private String ledger = ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv";
 	private String lender = ".\\New Bank\\NewBank\\newbank\\server\\lenders.csv";
 	private static String id = "";
@@ -27,7 +28,7 @@ public class NewBank {
 		}
 	}
 
-	public static String readData(String search, String filepath) {
+	public static String readData(String search, String filepath, int col) {
 
 		boolean idFound = false;
 		try {
@@ -37,7 +38,7 @@ public class NewBank {
 			while (row != null && !idFound) {
 				row = csvReader.readLine();
 				String[] data = row.split(",");
-				if (data[0].equals(search)) {
+				if (data[col-1].equals(search)) {
 					userDetails = row;
 					idFound = true;
 					return userDetails;
@@ -54,12 +55,12 @@ public class NewBank {
 
 	public Boolean fetchUserDetails(String username, String password) {
 		try {
-			readData(username, ".\\New Bank\\NewBank\\newbank\\server\\users.csv");
+			readData(username, users,2);
 			String user[] = userDetails.split(",");
-			id = user[user.length - 1];
-			accountusername = user[0];
-			accountpassword = user[1];
-			readData(id, ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv");
+			id = user[0];
+			accountusername = user[1];
+			accountpassword = user[2];
+			readData(id, ledger,1);
 			addTestData();
 			String newPass = generateHash(password, algorithm);
 			if (newPass.equals(accountpassword)) {
@@ -130,11 +131,11 @@ public class NewBank {
 					e.printStackTrace();
 				}
 				fw.append("\n");
+				fw.append(num1);
+				fw.append(",");
 				fw.append(input[1]);
 				fw.append(",");
 				fw.append(hashedPass);
-				fw.append(",");
-				fw.append(num1);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
