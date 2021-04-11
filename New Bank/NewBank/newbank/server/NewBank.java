@@ -1,6 +1,8 @@
 package newbank.server;
 
 import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.*;
@@ -15,6 +17,8 @@ public class NewBank {
 	private String ledger = ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv";
 	private String lender = ".\\New Bank\\NewBank\\newbank\\server\\lenders.csv";
 	private static String id = "";
+	private String algorithm = "SHA-256";
+	
 
 	private NewBank() {
 		customers = new HashMap<>();
@@ -57,7 +61,8 @@ public class NewBank {
 			accountpassword = user[1];
 			readData(id, ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv");
 			addTestData();
-			if (password.equals(accountpassword)) {
+			String newPass = generateHash(password, algorithm);
+			if (newPass.equals(accountpassword)) {
 				return true;
 			} else {
 				return false;
@@ -85,6 +90,13 @@ public class NewBank {
 	}
 
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
+		
+		try {
+			password = generateHash(password, algorithm);
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (userName.equals(accountusername) && (password.equals(accountpassword))) {
 			return new CustomerID(id);
 		}
@@ -110,10 +122,17 @@ public class NewBank {
 			String num1 = String.valueOf(num);
 			//Writing to the next line on users.csv
 			try (FileWriter fw = new FileWriter(".\\New Bank\\NewBank\\newbank\\server\\users.csv", true)) {
+				String hashedPass = "";
+				try {
+					 hashedPass = generateHash(input[2], algorithm);
+				} catch (NoSuchAlgorithmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				fw.append("\n");
 				fw.append(input[1]);
 				fw.append(",");
-				fw.append(input[2]);
+				fw.append(hashedPass);
 				fw.append(",");
 				fw.append(num1);
 			} catch (IOException e) {
@@ -623,5 +642,24 @@ public class NewBank {
 			e.printStackTrace();;
 		}
 		return result;
+	}
+
+	private static String generateHash(String inputdata, String algorithm) throws NoSuchAlgorithmException {
+		MessageDigest digest = MessageDigest.getInstance(algorithm);
+		digest.reset();
+		byte[] hash = digest.digest(inputdata.getBytes());
+		return bytesToHex(hash);
+	}
+
+	private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+	private static String bytesToHex(byte[] bytes){
+		char[] hexChars = new char[bytes.length * 2];
+		for(int j = 0; j < bytes.length;j++){
+			int v = bytes[j] & 0xFF;
+			hexChars[j*2] = hexArray[v>>>4];
+			hexChars[j*2+1] = hexArray[v & 0x0F];
+		}
+		return new String(hexChars);
 	}
 }
