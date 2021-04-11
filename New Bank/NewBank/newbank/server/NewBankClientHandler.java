@@ -32,20 +32,20 @@ public class NewBankClientHandler extends Thread{
 			// ask for password
 			out.println("Enter Password");
 			String password = in.readLine();
-			out.println("Checking Details...");
+			out.println("Checking Details...\n");
 			if(!bank.fetchUserDetails(userName, password)){
-				out.println("\nUser not recognized or wrong password! \nPlease try again.\n");
+				out.println("\nUser not recognized or wrong password!!!\nPlease try again.\n");
 				run();
 			}
 			// authenticate user and get customer ID token from bank for use in subsequent requests
 				CustomerID customer = bank.checkLogInDetails(userName, password);
 				if (customer == null) {
-					out.println("\nUser not recognized or wrong password! \nPlease try again.\n");
+					out.println("\nUser not recognized or wrong password!!!\nPlease try again.\n");
 					run();
 				}
 				// if the user is authenticated then get requests from the user and process them
 				if (customer != null) {
-					out.println("Log In Successful. What do you want to do?");
+					out.println("Log In Successful. What do you want to do?\n");
 					while (true) {
 						String request = in.readLine();
 						System.out.println("Request from " + customer.getKey());
@@ -57,7 +57,7 @@ public class NewBankClientHandler extends Thread{
 						}
 					}
 				} else {
-					out.println("Log In Failed");
+					out.println("\nLog In Failed\n");
 				}
 
 		} catch (IOException e) {
@@ -81,7 +81,7 @@ public class NewBankClientHandler extends Thread{
 			String response = "FAIL"; // initialise response string
 			while (response!="SUCCESS"){ // while loop until success is achieved, will not bring up login entry until then
 				// ask if login or signup
-				out.println("LOGIN or SIGNUP");
+				out.println("\nPlease LOGIN or SIGNUP\n");
 				String request = in.readLine();
 				response = bank.processRequest(request);
 				out.println(response);

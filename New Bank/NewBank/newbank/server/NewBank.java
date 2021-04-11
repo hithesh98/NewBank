@@ -111,11 +111,11 @@ public class NewBank {
 			return "SUCCESS";
 		} else if (input[0].equals("SIGNUP")) {
 			if (input.length < 4) {
-				return "FAIL";
+				return "\nPlease input <username> <password> <initial deposit>\n";
 			}
 			String name = input[1];
 			if (customers.containsKey(name)) {
-				return "FAIL";
+				return "\nUser already exist.\nPlease try different username.\n";
 			}
 			//Random 7 digit number for the customers ID
 			Random customerID = new Random();
@@ -149,64 +149,69 @@ public class NewBank {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			return "SUCCESS";
+			return "\nUSER CREATED\n";
 		}
-		return"FAIL";
+		return "\nPlease input LOGIN or SIGNUP\n";
 	}
 
 	// commands from the NewBank customer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if (customers.containsKey(customer.getKey())) {
 			String[] input = request.split(" "); // create an array of the parsed input string
+			// New account functionality
 			if (request.startsWith("NEWACCOUNT")) {
-				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
-			}
-
+				if (input.length != 2) { // return fail if wrong number of inputs
+					return "\nPlease input correct name of the account\n";
+				}	
+				else {
+					return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
+				}
+			}	
 			// Deposit functionality
 			if (request.startsWith("DEPOSIT")) {
 				if (input.length != 2) { // return fail if wrong number of inputs
-					return "Please input correct format";
+					return "\nPlease input correct format\n";
 				}
 				try { // check if amount is correct
 					double depositAmount = Double.parseDouble(input[1]);
 					if(depositAmount<0){
-						return "Please input correct amount";
+						return "\nPlease input correct amount\n";
 					}
 					if ((customers.get(customer.getKey())).editAccountBalance("Main", depositAmount)) { // try to add amount
 						String toBalance = customers.get(customer.getKey()).getBalance("Main");
 						editLedger(customer.getKey(), "Main", toBalance, ledger);
-						return "Deposit of " + String.format("%.2f", depositAmount) + " accepted";
+						return "\nDeposit of " + String.format("%.2f", depositAmount) + " accepted\n";
 					}
 				} catch (Exception e) {
-					return "Please input correct amount";
+					return "\nPlease input correct amount\n";
 				}
 			}
 
 			// Withdraw functionality
 			if (request.startsWith("WITHDRAW")) {
 				if (input.length != 2) { // return fail if wrong number of inputs
-					return "Please input correct format";
+					return "\nPlease input correct format\n";
 				}
 				try { // check if amount is correct
 					double withdrawAmount = Double.parseDouble(input[1]);
 					if(withdrawAmount<0){
-						return "Please input correct amount";
+						return "\nPlease input correct amount\n";
 					}
 					if ((customers.get(customer.getKey())).editAccountBalance("Main", -withdrawAmount)) { // try to withdraw amount
 						String toBalance = customers.get(customer.getKey()).getBalance("Main");
 						editLedger(customer.getKey(), "Main", toBalance, ledger);
-						return "Withdraw of " + String.format("%.2f", withdrawAmount) + " successful";
+						return "\nWithdraw of " + String.format("%.2f", withdrawAmount) + " successful\n";
 					} else {
-						return "Not sufficient balance on the Main account";
+						return "\nNot sufficient balance on the Main account\n";
 
 					}
 				} catch (Exception e) {
-					return "Please input correct amount";
+					return "\nPlease input correct amount\n";
 				}
 			}
 			if (request.startsWith("REGISTERLENDER")){
 				if(input.length < 2) { // return fail if not enough information is provided
-					return "FAIL";
+					return "\nPlease input correct amount\n";
 				}
 				return registerLender(input[1]);
 			}
@@ -224,7 +229,7 @@ public class NewBank {
 
 			if (input[0].equals("MOVE")) {
 				if (input.length < 4) { // return fail if not enough information is provided
-					return "FAIL";
+					return "\nPlease input correct format MOVE <amount> <from> <to>\n";
 				}
 				double amount = Double.parseDouble(input[1]);
 				String from = input[2];
@@ -250,11 +255,11 @@ public class NewBank {
 				case "SHOWMYACCOUNTS":
 					return showMyAccounts(customer);
 				default:
-					return "FAIL";
+					return "\nWrong COMMAND\n";
 			}
 		}
 
-		return "FAIL";
+		return "\nWrong COMMAND\n";
 	}
 
 	private String registerLender(String loanAmount){
@@ -266,18 +271,18 @@ public class NewBank {
 			if(addRecord(id, record, lender)){
 				customers.get(id).editAccountBalance("Main", -amount);
 				editLedger(id,"Main", newBalance, ledger);
-				return "REGISTERED AS A LENDER";
+				return "\nREGISTERED AS A LENDER\n";
 			} else {
-				return "ALREADY REGISTERED AS A LENDER";
+				return "\nALREADY REGISTERED AS A LENDER\n";
 			}
 		}
-		return "FAIL";
+		return "\nImpossible to execute\n";
 	}
 
 	private String borrowMicroLoan (Customer customer, String lender, String amount, String income, String term){
 		String lenders = readLenders();
 		if(!lenders.contains(lender)){
-			return  "INVALID LENDER";
+			return "\nINVALID LENDER\n";
 		}
 		MicroLoan loan = new MicroLoan();
 		loan.setAmount(Double.valueOf(amount));
@@ -293,14 +298,14 @@ public class NewBank {
 			customer.setLoans(existingLoan);
 
 		}
-		return "LOAN GRANTED";
+		return "\nLOAN GRANTED :)\n";
 	}
 
 	private String openAccount (CustomerID customer, String accountName){
 		(customers.get(customer.getKey())).addAccount(new Account(accountName, 0.00));
 		String customerName = customer.getKey();
 		editEnd(customerName, accountName + ",0"); //adds the account name and balance of 0 to the csv file
-		return "SUCCESS";
+		return "\nNew account ADDED\n";
 	}
 
 	// Appends to a value to the end of a record by searching for an id
@@ -449,13 +454,13 @@ public class NewBank {
 					String toBalance = customers.get(customer.getKey()).getBalance(to);
 					editLedger(customer.getKey(), from, fromBalance, ledger);
 					editLedger(customer.getKey(), to, toBalance, ledger);
-					return "SUCCESS";
+					return "\nTransfer successful\n";
 				} else { // if adding was unsuccessful, add it back to the original account
 					(customers.get(customer.getKey())).editAccountBalance(from, amount);
 				}
 			}
 		}
-		return "FAIL";
+		return "\nImpossible to execute the transfer\n";
 	}
 
 	private String payment (String toID, Double amount, String from, String to){
@@ -464,13 +469,13 @@ public class NewBank {
 				if (transfer(toID, to, amount)) { // try to add amount
 					String fromBalance = customers.get(id).getBalance(from);
 					editLedger(id, from, fromBalance, ledger);
-					return "SUCCESS";
+					return "\nPayment successful\n";
 				} else { // if adding was unsuccessful, add it back to the original account
 					customers.get(id).editAccountBalance(from, amount);
 				}
 			}
 		}
-		return "FAIL";
+		return "\nImpossible to execute the payment\n";
 	}
 
 	private Boolean transfer (String toID, String accountName, Double amount){
