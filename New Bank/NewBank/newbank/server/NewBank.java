@@ -147,6 +147,9 @@ public class NewBank {
 				}
 				try { // check if amount is correct
 					double depositAmount = Double.parseDouble(input[1]);
+					if(depositAmount<0){
+						return "Please input correct amount";
+					}
 					if ((customers.get(customer.getKey())).editAccountBalance("Main", depositAmount)) { // try to add amount
 						String toBalance = customers.get(customer.getKey()).getBalance("Main");
 						editLedger(customer.getKey(), "Main", toBalance);
@@ -164,6 +167,9 @@ public class NewBank {
 				}
 				try { // check if amount is correct
 					double withdrawAmount = Double.parseDouble(input[1]);
+					if(withdrawAmount<0){
+						return "Please input correct amount";
+					}
 					if ((customers.get(customer.getKey())).editAccountBalance("Main", -withdrawAmount)) { // try to withdraw amount
 						String toBalance = customers.get(customer.getKey()).getBalance("Main");
 						editLedger(customer.getKey(), "Main", toBalance);
