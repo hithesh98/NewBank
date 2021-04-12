@@ -177,6 +177,7 @@ public class NewBank {
 					return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
 				}
 			}	
+
 			// Deposit functionality
 			if (request.startsWith("DEPOSIT")) {
 				if (input.length != 2) { // check if wrong number of inputs
@@ -225,6 +226,7 @@ public class NewBank {
 					return "\nPlease input correct amount\n";
 				}
 			}
+
 			if (request.startsWith("REGISTERLENDER")){
 				if(input.length < 2) { // return fail if not enough information is provided
 					return "\nPlease input correct amount\n";
@@ -242,7 +244,7 @@ public class NewBank {
 				return readLenders(); // +1 to remove the leading space
 			}
 
-
+			// MOVE functionality
 			if (input[0].equals("MOVE")) {
 				if (input.length != 4) { // return fail if not enough information is provided
 					return "\nPlease input correct format MOVE <amount> <from> <to>\n";
@@ -271,15 +273,31 @@ public class NewBank {
 				return "LOGOFF";
 			}
 
+			// PAY functionality
 			if (input[0].equals("PAY")) {
-				if (input.length < 5) { // return fail if not enough information is provided
-					return "FAIL";
+				if (input.length != 3) { // return fail if not enough information is provided
+					return "\nPlease input correct format PAY <ID> <amount>\n";
 				}
-				String customerId = input[1];
-				Double amount = Double.parseDouble(input[2]);
-				String fromAccount = input[3];
-				String toAccount = input[4];
-				return payment(customerId, amount, fromAccount, toAccount);
+				try { // check if amount is correct
+					String customerId = input[1];
+					Double amount = Double.parseDouble(input[2]);
+					String fromAccount = "Main";
+					String toAccount = "Main";
+					if(amount<0 || !input[2].matches("-?\\d+(\\.\\d+)?")){ // check if correct amount
+						return "\nPlease input correct amount\n";
+					}
+					else if(BigDecimal.valueOf(amount).scale() > 2){ //check if over 2 decimal places
+						return "\nPlease input amount to 2 decimal places\n";
+					}
+					else if(Double.parseDouble(customers.get(customer.getKey()).getBalance(fromAccount))<amount){ //check enough balance
+						return "\nNot sufficient balance on the " + fromAccount + " account\n";
+					}
+					else {
+						return payment(customerId, amount, fromAccount, toAccount);
+					}
+				} catch (Exception e) {
+					return "\nPlease input correct amount\n";
+				}
 			}
 
 			switch (request) {
@@ -566,18 +584,16 @@ public class NewBank {
 	}
 
 	private String payment (String toID, Double amount, String from, String to){
-		if (amount > 0) { // should never need to move a negative amount
 			if (customers.get(id).editAccountBalance(from, -amount)) { // try to remove amount
 				if (transfer(toID, to, amount)) { // try to add amount
 					String fromBalance = customers.get(id).getBalance(from);
 					editLedger(id, from, fromBalance, ledger);
-					return "\nPayment successful\n";
+					return "\nPayment of " + String.format("%.2f", amount) + " to " + toID + " successful\n";
 				} else { // if adding was unsuccessful, add it back to the original account
 					customers.get(id).editAccountBalance(from, amount);
 				}
 			}
-		}
-		return "\nImpossible to execute the payment\n";
+		return "\nDestination account not recognized.\nTransfer not executed\n";
 	}
 
 	private Boolean transfer (String toID, String accountName, Double amount){
