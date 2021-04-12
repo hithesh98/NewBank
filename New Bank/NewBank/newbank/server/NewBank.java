@@ -251,11 +251,14 @@ public class NewBank {
 					String from = input[2];
 					String to = input[3];
 					double amount = Double.parseDouble(input[1]);
-					if(amount<0 || !input[1].matches("-?\\d+(\\.\\d+)?")){
+					if(amount<0 || !input[1].matches("-?\\d+(\\.\\d+)?")){ // check if correct amount
 						return "\nPlease input correct amount\n";
 					}
 					else if(BigDecimal.valueOf(amount).scale() > 2){ //check if over 2 decimal places
 						return "\nPlease input amount to 2 decimal places\n";
+					}
+					else if(Double.parseDouble(customers.get(customer.getKey()).getBalance(from))<amount){ //check enough balance
+						return "\nNot sufficient balance on the " + from + " account\n";
 					}
 					else {
 						return moveFunds(customer, amount, from, to);
