@@ -1,6 +1,7 @@
 package newbank.server;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -178,13 +179,16 @@ public class NewBank {
 			}	
 			// Deposit functionality
 			if (request.startsWith("DEPOSIT")) {
-				if (input.length != 2) { // return fail if wrong number of inputs
-					return "\nPlease input correct format\n";
-				}
+				if (input.length != 2) { // check if wrong number of inputs
+					return "\nPlease input correct format\ne.g. DEPOSIT <amount>\n";
+				}	
 				try { // check if amount is correct
 					double depositAmount = Double.parseDouble(input[1]);
-					if(depositAmount<0){
+					if(depositAmount<0 || depositAmount>1000000000 || !input[1].matches("-?\\d+(\\.\\d+)?")){
 						return "\nPlease input correct amount\n";
+					}
+					if(BigDecimal.valueOf(depositAmount).scale() > 2){ //check if over 2 decimal places
+						return "\nPlease input amount to 2 decimal places\n";
 					}
 					if ((customers.get(customer.getKey())).editAccountBalance("Main", depositAmount)) { // try to add amount
 						String toBalance = customers.get(customer.getKey()).getBalance("Main");
@@ -198,13 +202,16 @@ public class NewBank {
 
 			// Withdraw functionality
 			if (request.startsWith("WITHDRAW")) {
-				if (input.length != 2) { // return fail if wrong number of inputs
-					return "\nPlease input correct format\n";
+				if (input.length != 2) { // check if wrong number of inputs
+					return "\nPlease input correct format\ne.g. WITHDRAW <amount>\n";
 				}
 				try { // check if amount is correct
 					double withdrawAmount = Double.parseDouble(input[1]);
-					if(withdrawAmount<0){
+					if(withdrawAmount<0 || !input[1].matches("-?\\d+(\\.\\d+)?")){
 						return "\nPlease input correct amount\n";
+					}
+					if(BigDecimal.valueOf(withdrawAmount).scale() > 2){ //check if over 2 decimal places
+						return "\nPlease input amount to 2 decimal places\n";
 					}
 					if ((customers.get(customer.getKey())).editAccountBalance("Main", -withdrawAmount)) { // try to withdraw amount
 						String toBalance = customers.get(customer.getKey()).getBalance("Main");
@@ -237,7 +244,7 @@ public class NewBank {
 
 
 			if (input[0].equals("MOVE")) {
-				if (input.length < 4) { // return fail if not enough information is provided
+				if (input.length != 4) { // return fail if not enough information is provided
 					return "\nPlease input correct format MOVE <amount> <from> <to>\n";
 				}
 				double amount = Double.parseDouble(input[1]);
