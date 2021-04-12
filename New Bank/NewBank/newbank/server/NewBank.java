@@ -247,10 +247,22 @@ public class NewBank {
 				if (input.length != 4) { // return fail if not enough information is provided
 					return "\nPlease input correct format MOVE <amount> <from> <to>\n";
 				}
-				double amount = Double.parseDouble(input[1]);
-				String from = input[2];
-				String to = input[3];
-				return moveFunds(customer, amount, from, to);
+				try { // check if amount is correct
+					String from = input[2];
+					String to = input[3];
+					double amount = Double.parseDouble(input[1]);
+					if(amount<0 || !input[1].matches("-?\\d+(\\.\\d+)?")){
+						return "\nPlease input correct amount\n";
+					}
+					else if(BigDecimal.valueOf(amount).scale() > 2){ //check if over 2 decimal places
+						return "\nPlease input amount to 2 decimal places\n";
+					}
+					else {
+						return moveFunds(customer, amount, from, to);
+					}
+				} catch (Exception e) {
+					return "\nPlease input correct amount\n";
+				}
 			}
 			if (input[0].equals("LOGOFF")) {
 				return "LOGOFF";
@@ -541,13 +553,13 @@ public class NewBank {
 					String toBalance = customers.get(customer.getKey()).getBalance(to);
 					editLedger(customer.getKey(), from, fromBalance, ledger);
 					editLedger(customer.getKey(), to, toBalance, ledger);
-					return "\nTransfer successful\n";
+					return "\nTransfer of " + String.format("%.2f", amount) + " successful\n";
 				} else { // if adding was unsuccessful, add it back to the original account
 					(customers.get(customer.getKey())).editAccountBalance(from, amount);
 				}
 			}
 		}
-		return "\nImpossible to execute the transfer\n";
+		return "\nWrong account name\n";
 	}
 
 	private String payment (String toID, Double amount, String from, String to){
