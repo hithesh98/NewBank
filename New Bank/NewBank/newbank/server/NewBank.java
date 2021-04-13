@@ -292,7 +292,7 @@ public class NewBank {
 		String lenderDetails = readRecord(lenderID, 0, lender);
 		String[] lenderValues = lenderDetails.split(",");
 		if (amount <= Double.parseDouble(lenderValues[1])){
-			Double interest = Double.parseDouble(lenderValues[2]);
+			Double interest = (double) 5;
 			String repayments = Double.toString(amount*(1 +(interest/100))/Double.parseDouble(term));
 			Random loanID = new Random();
 			int num = loanID.nextInt(9000000) + 1000000;
@@ -300,13 +300,14 @@ public class NewBank {
 			if (addNewRecord(record, loans)){
 				changeCSVValue(lenderID, Double.toString(Double.parseDouble(lenderValues[1])-amount), 2, lender);
 				Double balance = Double.parseDouble(customers.get(id).getBalance("Main"));
+				customers.get(id).editAccountBalance("Main", amount);
 				editLedger(id, "Main", Double.toString(amount + balance), ledger);
-				return "\nLOAN GRANTED :)\n";
+				return "\nLOAN GRANTED";
 			} else {
-				return "\nLOAN FAILED :(\n";
+				return "\nLOAN FAILED\n";
 			}
 		}
-		return "SOMETHING WENT WRONG";
+		return "\nSOMETHING WENT WRONG\n";
 
 	}
 
