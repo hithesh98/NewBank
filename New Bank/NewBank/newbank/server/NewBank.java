@@ -4,8 +4,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Random;
 import java.util.*;
 
 public class NewBank {
@@ -121,8 +119,18 @@ public class NewBank {
 			if (input.length < 4) {
 				return "\nPlease input <username> <password> <initial deposit>\n";
 			}
+			List<String> usernames = new ArrayList<>();
+			try (BufferedReader br = new BufferedReader(new FileReader(users))){
+				String data;
+				while((data = br.readLine()) != null){
+					String[] nameValues = data.split(",");
+					usernames.add(nameValues[1]);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			String name = input[1];
-			if (customers.containsKey(name)) {
+			if(usernames.contains(name)){
 				return "\nUser already exist.\nPlease try different username.\n";
 			}
 			//Random 7 digit number for the customers ID
