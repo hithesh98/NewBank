@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Pattern;
+import java.util.*;
 
 public class NewBank {
 
@@ -23,6 +24,7 @@ public class NewBank {
 	private String users = ".\\New Bank\\NewBank\\newbank\\server\\users.csv";
 	private String ledger = ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv";
 	private String lender = ".\\New Bank\\NewBank\\newbank\\server\\lenders.csv";
+	private String loans = ".\\New Bank\\NewBank\\newbank\\server\\loans.csv";
 	private static String id = "";
 	private String algorithm = "SHA-256";
 	private final int MAX_LOGIN_ATTEMPTS = 3;
@@ -126,8 +128,18 @@ public class NewBank {
 			if (input.length < 4) {
 				return "\nPlease input <username> <password> <initial deposit>\n";
 			}
+			List<String> usernames = new ArrayList<>();
+			try (BufferedReader br = new BufferedReader(new FileReader(users))){
+				String data;
+				while((data = br.readLine()) != null){
+					String[] nameValues = data.split(",");
+					usernames.add(nameValues[1]);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			String name = input[1];
-			if (customers.containsKey(name)) {
+			if(usernames.contains(name)){
 				return "\nUser already exist.\nPlease try different username.\n";
 			}
 			//Random 7 digit number for the customers ID
@@ -245,11 +257,32 @@ public class NewBank {
 				return registerLender(input[1]);
 			}
 			if (request.startsWith("BORROWMICROLOAN")){
-				if(input.length < 4) { // return fail if not enough information is provided
-					return "FAIL";
+			try {				
+				if (input.length != 4) { // return fail if not enough information is provided
+					return "\nPlease input correct format BORROWMICROLOAN <LENDER_ID> <Amount> <Term(in months)> \n";
+				} else if(Double.parseDouble(input[2])<0 || !input[2].matches("-?\\d+(\\.\\d+)?")) {
+					return "\nPlease input correct amount\n";	
+				} else if (BigDecimal.valueOf(Double.parseDouble(input[2])).scale() > 2){
+					return "\nPlease input amount to 2 decimal places\n";
+				} else if (Double.parseDouble(input[3]) < 0 || Double.parseDouble(input[3]) > 36){
+					return "\nPlease input correct format for <Term(in months)>\nMax Term is 36 months\n";
+				} else {
+					Boolean checkterm = true;
+					try {
+						Integer term = Integer.parseInt(input[3]);
+					} catch (Exception e) {
+						//TODO: handle exception
+						checkterm = false;
+						return "\n<Term> must be an integer between 1 and 36\n";
+					}
+					if(checkterm){
+						return borrowMicroLoan(input[1], Double.parseDouble(input[2]), input[3]);
+					}
 				}
-				Customer cust = customers.get(customer.getKey());
-				return borrowMicroLoan(cust, input[1], input[2], input[3], input[4]);
+			} catch (Exception e) {
+				//TODO: handle exception
+				return "\nWrong command\n";
+			}
 			}
 			if (request.startsWith("SHOWMICROLENDERS")){
 				return readLenders(); // +1 to remove the leading space
@@ -328,7 +361,7 @@ public class NewBank {
 		if(balance > amount){
 			String newBalance = Double.toString(balance - amount);
 			String record = id + "," + loanAmount;
-			if(addRecord(id, record, lender)){
+			if(addRecordBySearch(id, record, lender)){
 				customers.get(id).editAccountBalance("Main", -amount);
 				editLedger(id,"Main", newBalance, ledger);
 				return "\nREGISTERED AS A LENDER\n";
@@ -339,26 +372,36 @@ public class NewBank {
 		return "\nImpossible to execute\n";
 	}
 
-	private String borrowMicroLoan (Customer customer, String lender, String amount, String income, String term){
-		String lenders = readLenders();
-		if(!lenders.contains(lender)){
-			return "\nINVALID LENDER\n";
+	private String borrowMicroLoan (String lenderID, Double amount, String term){
+		String lenderDetails;
+		try {
+			lenderDetails = readRecord(lenderID, 0, lender);
+			if(lenderDetails == ""){
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			//TODO: handle exception
+			return "\nLender cannot be found\n";
 		}
-		MicroLoan loan = new MicroLoan();
-		loan.setAmount(Double.valueOf(amount));
-		loan.setCurrentIncome(Double.valueOf(income));
-		loan.setRepaymentTerm(term);
-		ArrayList<MicroLoan> existingLoan = customer.getLoans();
-		if (existingLoan == null) {
-			ArrayList<MicroLoan> newLoan = new ArrayList<>();
-			newLoan.add(loan);
-			customer.setLoans(newLoan);
-		} else {
-			existingLoan.add(loan);
-			customer.setLoans(existingLoan);
+		String[] lenderValues = lenderDetails.split(",");
+		if (amount <= Double.parseDouble(lenderValues[1])){
+			Double interest = (double) 5;
+			String repayments = Double.toString(amount*(1 +(interest/100))/Double.parseDouble(term));
+			Random loanID = new Random();
+			int num = loanID.nextInt(9000000) + 1000000;
+			String record = String.valueOf(num) + "," + lenderID + "," + id + "," + Double.toString(amount) + "," + "0" + "," + repayments;
+			if (addNewRecord(record, loans)){
+				changeCSVValue(lenderID, Double.toString(Double.parseDouble(lenderValues[1])-amount), 2, lender);
+				Double balance = Double.parseDouble(customers.get(id).getBalance("Main"));
+				customers.get(id).editAccountBalance("Main", amount);
+				editLedger(id, "Main", Double.toString(amount + balance), ledger);
+				return "\nLOAN GRANTED";
+			} else {
+				return "\nAmount greater than max loan available\n";
+			}
+		}
+		return "\nSOMETHING WENT WRONG\n";
 
-		}
-		return "\nLOAN GRANTED :)\n";
 	}
 
 	private String openAccount (CustomerID customer, String accountName){
@@ -709,7 +752,7 @@ public class NewBank {
 		return result;
 	}
 
-	private boolean addRecord(String search, String stringAdd, String path) {
+	private boolean addRecordBySearch(String search, String stringAdd, String path) {
 		boolean result = true;
 		String filepath = path;
 		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
@@ -777,6 +820,97 @@ public class NewBank {
 		// deletes the temporary file
 		boolean b = newFile.delete();
 		return result;
+	}
+
+	private boolean addNewRecord(String stringAdd, String path) {
+		boolean result = true;
+		String filepath = path;
+		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
+		File oldFile = new File(filepath);
+		File newFile = new File(tempFile);
+
+
+		try {
+			// Write to a temperory file
+			FileWriter fw = new FileWriter(tempFile, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter pw = new PrintWriter(bw);
+
+			// read the orginal data.csv file and searches for ID and appends value to the end
+			BufferedReader csvReader = new BufferedReader(new FileReader(filepath));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null && result != false){
+						result = false;
+						pw.println(row);
+				} else {
+					row = stringAdd;
+					pw.println(row);
+					result = true;
+					break;
+				}
+			}
+			pw.flush();
+			pw.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		try {
+			// Overwrittes the original data.csv file
+			FileWriter fw2 = new FileWriter(filepath);
+			BufferedWriter bw2 = new BufferedWriter(fw2);
+			PrintWriter pw2 = new PrintWriter(bw2);
+
+			// Copies all data from temporary file
+			BufferedReader csvReader = new BufferedReader(new FileReader(tempFile));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					pw2.println(row);
+				}
+			}
+			pw2.flush();
+			pw2.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		// deletes the temporary file
+		boolean b = newFile.delete();
+		return result;
+	}
+
+	private String readRecord(String search,int col , String filepath){
+		String result = "";
+		boolean idFound = false;
+		try {
+
+			BufferedReader csvReader = new BufferedReader(new FileReader(filepath));
+			String row = "placeholder";
+			while (row != null && !idFound) {
+				row = csvReader.readLine();
+				String[] data = row.split(",");
+				if (data[col].equals(search)) {
+					result = row;
+					idFound = true;
+					return result;
+				}
+			}
+			csvReader.close();
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+			;
+		}
+		return result;
+
 	}
 
 	private String readLenders(){
