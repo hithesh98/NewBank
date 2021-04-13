@@ -259,7 +259,7 @@ public class NewBank {
 			if (request.startsWith("LOANREPAYMENT")){
 				try {
 					if (input.length != 3) { // return fail if not enough information is provided
-						return "\nPlease input correct format LOANREPAYMENT <LENDER_ID> <Amount> \n";
+						return "\nPlease input correct format LOANREPAYMENT <LOAN_ID> <Amount> \n";
 					} else if(Double.parseDouble(input[2])<0 || !input[2].matches("-?\\d+(\\.\\d+)?")) {
 						return "\nPlease input correct amount\n";
 					} else if (BigDecimal.valueOf(Double.parseDouble(input[2])).scale() > 2){
@@ -410,9 +410,6 @@ public class NewBank {
 				return "\nAmount greater than max loan available\n";
 			}
 		}
-
-
-	//}
 
 	private String borrowMicroLoan (String lenderID, Double amount, String term){
 		String lenderDetails;
