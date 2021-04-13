@@ -64,13 +64,15 @@ Functional Requirements
 
 	FR11	Borrow from a micro-loan – allows user to borrow a micro-lender specifying amount needed and repayment term, any income details, credit checks. 
 
-	FR12	Show loans – show the user current outstanding loans
+	FR12	Show loans and applicable interest rate – show the user current outstanding loans and applicable interest rate
 
-	FR13	User shall be able to log out of the system. (LOGOFF)
+	FR13    Repayment function - allows user to repay the outstanding loans and applicable interest rate
+
+	FR14	User shall be able to log out of the system. (LOGOFF)
 	
-		FR13.1 User should be able to log off using "LOGOFF" function.
+		FR14.1 User should be able to log off using "LOGOFF" function.
 		
-		FR13.2 After using "LOGOFF" function program should ask for User Name again.
+		FR14.2 After using "LOGOFF" function program should ask for User Name again.
 
 
 Non-Functional Requirements

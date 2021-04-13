@@ -256,6 +256,24 @@ public class NewBank {
 				}
 				return registerLender(input[1]);
 			}
+			if (request.startsWith("LOANREPAYMENT")){
+				try {
+					if (input.length != 3) { // return fail if not enough information is provided
+						return "\nPlease input correct format LOANREPAYMENT <LENDER_ID> <Amount> \n";
+					} else if(Double.parseDouble(input[2])<0 || !input[2].matches("-?\\d+(\\.\\d+)?")) {
+						return "\nPlease input correct amount\n";
+					} else if (BigDecimal.valueOf(Double.parseDouble(input[2])).scale() > 2){
+						return "\nPlease input amount to 2 decimal places\n";
+					}
+					else{
+							return repayLoan(input[1], Double.parseDouble(input[2]));
+						}
+
+				} catch (Exception e) {
+					//TODO: handle exception
+					return "\nWrong command\n";
+				}
+			}
 			if (request.startsWith("BORROWMICROLOAN")){
 			try {				
 				if (input.length != 4) { // return fail if not enough information is provided
@@ -371,6 +389,30 @@ public class NewBank {
 		}
 		return "\nImpossible to execute\n";
 	}
+	private String repayLoan (String loanId, Double amount){
+		String loanDetails;
+		try {
+			loanDetails = readRecord(loanId, 0, loans);
+			if(loanDetails == ""){
+				throw new Exception();
+			}
+		} catch (Exception e) {
+
+			return "\nloan id cannot be found\n";
+		}
+		String[] lenderValues = loanDetails.split(",");
+		if (amount <= Double.parseDouble(lenderValues[3])){
+			Double loanAmount = Double.parseDouble(lenderValues[3]);
+			Double repaymentAmount = loanAmount -amount;
+			changeCSVValue(loanId, Double.toString(repaymentAmount), 4, loans);
+				return "\nLOAN REPAID";
+			} else {
+				return "\nAmount greater than max loan available\n";
+			}
+		}
+
+
+	//}
 
 	private String borrowMicroLoan (String lenderID, Double amount, String term){
 		String lenderDetails;
