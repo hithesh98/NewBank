@@ -15,7 +15,9 @@ Returns SUCCESS or FAIL
 PASSWORDCHANGE <NEW PASSWORD> <VERIFY NEW PASSWORD>
 Allows a user to change their password
 e.g. PASSWORDCHANGE passw0rd passw0rd
-Returns SUCCESS or FAIL
+Returns Please input correct format
+or New password and verify new password should match
+or Password has been successfully changed
 
 SHOWMYACCOUNTS
 Returns a list of all the customers accounts along with their current balance 

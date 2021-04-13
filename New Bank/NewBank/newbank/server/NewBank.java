@@ -197,7 +197,7 @@ public class NewBank {
 			//Change password function
 			if (request.startsWith("PASSWORDCHANGE")){
 				if(input.length != 3){
-					return "FAIL";
+					return "\nPlease input correct format\ne.g. PASSWORDCHANGE <NEW PASSWORD> <VERIFY NEW PASSWORD>";
 				}
 				return changePassword(input[1],input[2]);
 			}
@@ -415,7 +415,7 @@ public class NewBank {
 	private String changePassword(String newPassword, String verifyPassword) {
 		//Check if new password and verify new password match
 		if (!verifyPassword.equals(newPassword)) {
-			return "FAIL";
+			return "New password and verify new password should match";
 		}
 		//Hash new password
 		String newPWD = null;
@@ -434,7 +434,7 @@ public class NewBank {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-			return "SUCCESS";
+			return "Password has been successfully changed";
 		}
 
 	// Appends to a value to the end of a record by searching for an id
