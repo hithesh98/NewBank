@@ -1,6 +1,7 @@
 package newbank.server;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -226,10 +227,32 @@ public class NewBank {
 				return registerLender(input[1]);
 			}
 			if (request.startsWith("BORROWMICROLOAN")){
-				if(input.length < 4) { // return fail if not enough information is provided
-					return "FAIL";
+			try {				
+				if (input.length != 4) { // return fail if not enough information is provided
+					return "\nPlease input correct format BORROWMICROLOAN <LENDER_ID> <Amount> <Term(in months)> \n";
+				} else if(Double.parseDouble(input[2])<0 || !input[2].matches("-?\\d+(\\.\\d+)?")) {
+					return "\nPlease input correct amount\n";	
+				} else if (BigDecimal.valueOf(Double.parseDouble(input[2])).scale() > 2){
+					return "\nPlease input amount to 2 decimal places\n";
+				} else if (Double.parseDouble(input[3]) < 0 || Double.parseDouble(input[3]) > 36){
+					return "\nPlease input correct format for <Term(in months)>\nMax Term is 36 months\n";
+				} else {
+					Boolean checkterm = true;
+					try {
+						Integer term = Integer.parseInt(input[3]);
+					} catch (Exception e) {
+						//TODO: handle exception
+						checkterm = false;
+						return "\n<Term> must be an integer between 1 and 36\n";
+					}
+					if(checkterm){
+						return borrowMicroLoan(input[1], Double.parseDouble(input[2]), input[3]);
+					}
 				}
-				return borrowMicroLoan(input[1], Double.parseDouble(input[2]), input[3]);
+			} catch (Exception e) {
+				//TODO: handle exception
+				return "\nWrong command\n";
+			}
 			}
 			if (request.startsWith("SHOWMICROLENDERS")){
 				return readLenders(); // +1 to remove the leading space
@@ -289,7 +312,16 @@ public class NewBank {
 	}
 
 	private String borrowMicroLoan (String lenderID, Double amount, String term){
-		String lenderDetails = readRecord(lenderID, 0, lender);
+		String lenderDetails;
+		try {
+			lenderDetails = readRecord(lenderID, 0, lender);
+			if(lenderDetails == ""){
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			//TODO: handle exception
+			return "\nLender cannot be found\n";
+		}
 		String[] lenderValues = lenderDetails.split(",");
 		if (amount <= Double.parseDouble(lenderValues[1])){
 			Double interest = (double) 5;
@@ -304,7 +336,7 @@ public class NewBank {
 				editLedger(id, "Main", Double.toString(amount + balance), ledger);
 				return "\nLOAN GRANTED";
 			} else {
-				return "\nLOAN FAILED\n";
+				return "\nAmount greater than max loan available\n";
 			}
 		}
 		return "\nSOMETHING WENT WRONG\n";
