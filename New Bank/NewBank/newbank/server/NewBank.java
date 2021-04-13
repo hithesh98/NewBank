@@ -1,9 +1,17 @@
 package newbank.server;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.regex.Pattern;
 import java.util.*;
 
 public class NewBank {
@@ -179,14 +187,20 @@ public class NewBank {
 			String[] input = request.split(" "); // create an array of the parsed input string
 			// New account functionality
 			if (request.startsWith("NEWACCOUNT")) {
-				if (input.length != 2) { // return fail if wrong number of inputs
+        if (input.length != 2) { // return fail if wrong number of inputs
 					return "\nPlease input correct name of the account\n";
 				}	
 				else {
 					return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
 				}
 			}	
-
+			//Change password function
+			if (request.startsWith("PASSWORDCHANGE")){
+				if(input.length != 3){
+					return "FAIL";
+				}
+				return changePassword(input[1],input[2]);
+			}
 			// Deposit functionality
 			if (request.startsWith("DEPOSIT")) {
 				if (input.length != 2) { // check if wrong number of inputs
@@ -396,6 +410,32 @@ public class NewBank {
 		editEnd(customerName, accountName + ",0"); //adds the account name and balance of 0 to the csv file
 		return "\nNew account ADDED\n";
 	}
+
+	//Change password method
+	private String changePassword(String newPassword, String verifyPassword) {
+		//Check if new password and verify new password match
+		if (!verifyPassword.equals(newPassword)) {
+			return "FAIL";
+		}
+		//Hash new password
+		String newPWD = null;
+		try {
+			newPWD = generateHash(newPassword, algorithm);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		//Replace old password with new password in the users.csv file
+		Path users = Paths.get(".\\New Bank\\NewBank\\newbank\\server\\users.csv");
+		try {
+			byte[] buffer = Files.readAllBytes(users);
+			String s = new String(buffer, Charset.defaultCharset());
+			s = s.replaceAll(Pattern.quote(String.valueOf(accountpassword)), newPWD);
+			Files.write(users, s.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			return "SUCCESS";
+		}
 
 	// Appends to a value to the end of a record by searching for an id
 	private void editEnd (String search, String stringAdd){

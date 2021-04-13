@@ -12,6 +12,11 @@ then continues to the login information
 e.g. SIGNUP Samantha pa55word 100
 Returns SUCCESS or FAIL
 
+PASSWORDCHANGE <NEW PASSWORD> <VERIFY NEW PASSWORD>
+Allows a user to change their password
+e.g. PASSWORDCHANGE passw0rd passw0rd
+Returns SUCCESS or FAIL
+
 SHOWMYACCOUNTS
 Returns a list of all the customers accounts along with their current balance 
 e.g. Main: 1000.0 
