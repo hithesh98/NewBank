@@ -1,6 +1,7 @@
 package newbank.server;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -17,6 +18,7 @@ public class NewBank {
 	private String lender = ".\\New Bank\\NewBank\\newbank\\server\\lenders.csv";
 	private static String id = "";
 	private String algorithm = "SHA-256";
+	private final int MAX_LOGIN_ATTEMPTS = 3;
 	
 
 	private NewBank() {
@@ -51,24 +53,30 @@ public class NewBank {
 		return "User not found";
 	}
 
-	public Boolean fetchUserDetails(String username, String password) {
+	public int fetchUserDetails(String username, String password) {
 		try {
 			readData(username, users,2);
 			String user[] = userDetails.split(",");
 			id = user[0];
 			accountusername = user[1];
 			accountpassword = user[2];
+			int loginAttempts = Integer.parseInt(user[3]);
+			if(loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+				return 2; // fail, too many failed login attempts
+			}
 			readData(id, ledger,1);
 			addTestData();
 			String newPass = generateHash(password, algorithm);
 			if (newPass.equals(accountpassword)) {
-				return true;
+				changeCSVValue(id,"0",4,users); // reset login attempts counter
+				return 0; // success
 			} else {
-				return false;
+				changeCSVValue(id,String.valueOf(loginAttempts+1),4,users);
+				return 1; // fail, no username/password match
 			}
 		} catch (Exception e) {
 			//TODO: handle exception
-			return false;
+			return -1; //undefined error
 		}
 	}
 
@@ -109,7 +117,7 @@ public class NewBank {
 			return "SUCCESS";
 		} else if (input[0].equals("SIGNUP")) {
 			if (input.length < 4) {
-				return "FAIL";
+				return "\nPlease input <username> <password> <initial deposit>\n";
 			}
 			List<String> usernames = new ArrayList<>();
 			try (BufferedReader br = new BufferedReader(new FileReader(users))){
@@ -123,7 +131,7 @@ public class NewBank {
 			}
 			String name = input[1];
 			if(usernames.contains(name)){
-				return "FAIL";
+				return "\nUser already exist.\nPlease try different username.\n";
 			}
 			//Random 7 digit number for the customers ID
 			Random customerID = new Random();
@@ -144,6 +152,8 @@ public class NewBank {
 				fw.append(input[1]);
 				fw.append(",");
 				fw.append(hashedPass);
+				fw.append(",");
+				fw.append("0"); // Failed login attempts
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -157,64 +167,77 @@ public class NewBank {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			return "SUCCESS";
+			return "\nUSER CREATED\n";
 		}
-		return"FAIL";
+		return "\nPlease input LOGIN or SIGNUP\n";
 	}
 
 	// commands from the NewBank customer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if (customers.containsKey(customer.getKey())) {
 			String[] input = request.split(" "); // create an array of the parsed input string
+			// New account functionality
 			if (request.startsWith("NEWACCOUNT")) {
-				return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
-			}
+				if (input.length != 2) { // return fail if wrong number of inputs
+					return "\nPlease input correct name of the account\n";
+				}	
+				else {
+					return openAccount(customer, request.substring(request.indexOf(" ") + 1)); // +1 to remove the leading space
+				}
+			}	
 
 			// Deposit functionality
 			if (request.startsWith("DEPOSIT")) {
-				if (input.length != 2) { // return fail if wrong number of inputs
-					return "Please input correct format";
-				}
+				if (input.length != 2) { // check if wrong number of inputs
+					return "\nPlease input correct format\ne.g. DEPOSIT <amount>\n";
+				}	
 				try { // check if amount is correct
 					double depositAmount = Double.parseDouble(input[1]);
-					if(depositAmount<0){
-						return "Please input correct amount";
+					if(depositAmount<0 || depositAmount>1000000000 || !input[1].matches("-?\\d+(\\.\\d+)?")){
+						return "\nPlease input correct amount\n";
+					}
+					if(BigDecimal.valueOf(depositAmount).scale() > 2){ //check if over 2 decimal places
+						return "\nPlease input amount to 2 decimal places\n";
 					}
 					if ((customers.get(customer.getKey())).editAccountBalance("Main", depositAmount)) { // try to add amount
 						String toBalance = customers.get(customer.getKey()).getBalance("Main");
 						editLedger(customer.getKey(), "Main", toBalance, ledger);
-						return "Deposit of " + String.format("%.2f", depositAmount) + " accepted";
+						return "\nDeposit of " + String.format("%.2f", depositAmount) + " accepted\n";
 					}
 				} catch (Exception e) {
-					return "Please input correct amount";
+					return "\nPlease input correct amount\n";
 				}
 			}
 
 			// Withdraw functionality
 			if (request.startsWith("WITHDRAW")) {
-				if (input.length != 2) { // return fail if wrong number of inputs
-					return "Please input correct format";
+				if (input.length != 2) { // check if wrong number of inputs
+					return "\nPlease input correct format\ne.g. WITHDRAW <amount>\n";
 				}
 				try { // check if amount is correct
 					double withdrawAmount = Double.parseDouble(input[1]);
-					if(withdrawAmount<0){
-						return "Please input correct amount";
+					if(withdrawAmount<0 || !input[1].matches("-?\\d+(\\.\\d+)?")){
+						return "\nPlease input correct amount\n";
+					}
+					if(BigDecimal.valueOf(withdrawAmount).scale() > 2){ //check if over 2 decimal places
+						return "\nPlease input amount to 2 decimal places\n";
 					}
 					if ((customers.get(customer.getKey())).editAccountBalance("Main", -withdrawAmount)) { // try to withdraw amount
 						String toBalance = customers.get(customer.getKey()).getBalance("Main");
 						editLedger(customer.getKey(), "Main", toBalance, ledger);
-						return "Withdraw of " + String.format("%.2f", withdrawAmount) + " successful";
+						return "\nWithdraw of " + String.format("%.2f", withdrawAmount) + " successful\n";
 					} else {
-						return "Not sufficient balance on the Main account";
+						return "\nNot sufficient balance on the Main account\n";
 
 					}
 				} catch (Exception e) {
-					return "Please input correct amount";
+					return "\nPlease input correct amount\n";
 				}
 			}
+
 			if (request.startsWith("REGISTERLENDER")){
 				if(input.length < 2) { // return fail if not enough information is provided
-					return "FAIL";
+					return "\nPlease input correct amount\n";
 				}
 				return registerLender(input[1]);
 			}
@@ -229,40 +252,71 @@ public class NewBank {
 				return readLenders(); // +1 to remove the leading space
 			}
 
-
+			// MOVE functionality
 			if (input[0].equals("MOVE")) {
-				if (input.length < 4) { // return fail if not enough information is provided
-					return "FAIL";
+				if (input.length != 4) { // return fail if not enough information is provided
+					return "\nPlease input correct format MOVE <amount> <from> <to>\n";
 				}
-				double amount = Double.parseDouble(input[1]);
-				String from = input[2];
-				String to = input[3];
-				return moveFunds(customer, amount, from, to);
+				try { // check if amount is correct
+					String from = input[2];
+					String to = input[3];
+					double amount = Double.parseDouble(input[1]);
+					if(amount<0 || !input[1].matches("-?\\d+(\\.\\d+)?")){ // check if correct amount
+						return "\nPlease input correct amount\n";
+					}
+					else if(BigDecimal.valueOf(amount).scale() > 2){ //check if over 2 decimal places
+						return "\nPlease input amount to 2 decimal places\n";
+					}
+					else if(Double.parseDouble(customers.get(customer.getKey()).getBalance(from))<amount){ //check enough balance
+						return "\nNot sufficient balance on the " + from + " account\n";
+					}
+					else {
+						return moveFunds(customer, amount, from, to);
+					}
+				} catch (Exception e) {
+					return "\nPlease input correct amount\n";
+				}
 			}
 			if (input[0].equals("LOGOFF")) {
 				return "LOGOFF";
 			}
 
+			// PAY functionality
 			if (input[0].equals("PAY")) {
-				if (input.length < 5) { // return fail if not enough information is provided
-					return "FAIL";
+				if (input.length != 3) { // return fail if not enough information is provided
+					return "\nPlease input correct format PAY <ID> <amount>\n";
 				}
-				String customerId = input[1];
-				Double amount = Double.parseDouble(input[2]);
-				String fromAccount = input[3];
-				String toAccount = input[4];
-				return payment(customerId, amount, fromAccount, toAccount);
+				try { // check if amount is correct
+					String customerId = input[1];
+					Double amount = Double.parseDouble(input[2]);
+					String fromAccount = "Main";
+					String toAccount = "Main";
+					if(amount<0 || !input[2].matches("-?\\d+(\\.\\d+)?")){ // check if correct amount
+						return "\nPlease input correct amount\n";
+					}
+					else if(BigDecimal.valueOf(amount).scale() > 2){ //check if over 2 decimal places
+						return "\nPlease input amount to 2 decimal places\n";
+					}
+					else if(Double.parseDouble(customers.get(customer.getKey()).getBalance(fromAccount))<amount){ //check enough balance
+						return "\nNot sufficient balance on the " + fromAccount + " account\n";
+					}
+					else {
+						return payment(customerId, amount, fromAccount, toAccount);
+					}
+				} catch (Exception e) {
+					return "\nPlease input correct amount\n";
+				}
 			}
 
 			switch (request) {
 				case "SHOWMYACCOUNTS":
 					return showMyAccounts(customer);
 				default:
-					return "FAIL";
+					return "\nWrong COMMAND\n";
 			}
 		}
 
-		return "FAIL";
+		return "\nWrong COMMAND\n";
 	}
 
 	private String registerLender(String loanAmount){
@@ -274,18 +328,18 @@ public class NewBank {
 			if(addRecord(id, record, lender)){
 				customers.get(id).editAccountBalance("Main", -amount);
 				editLedger(id,"Main", newBalance, ledger);
-				return "REGISTERED AS A LENDER";
+				return "\nREGISTERED AS A LENDER\n";
 			} else {
-				return "ALREADY REGISTERED AS A LENDER";
+				return "\nALREADY REGISTERED AS A LENDER\n";
 			}
 		}
-		return "FAIL";
+		return "\nImpossible to execute\n";
 	}
 
 	private String borrowMicroLoan (Customer customer, String lender, String amount, String income, String term){
 		String lenders = readLenders();
 		if(!lenders.contains(lender)){
-			return  "INVALID LENDER";
+			return "\nINVALID LENDER\n";
 		}
 		MicroLoan loan = new MicroLoan();
 		loan.setAmount(Double.valueOf(amount));
@@ -301,14 +355,14 @@ public class NewBank {
 			customer.setLoans(existingLoan);
 
 		}
-		return "LOAN GRANTED";
+		return "\nLOAN GRANTED :)\n";
 	}
 
 	private String openAccount (CustomerID customer, String accountName){
 		(customers.get(customer.getKey())).addAccount(new Account(accountName, 0.00));
 		String customerName = customer.getKey();
 		editEnd(customerName, accountName + ",0"); //adds the account name and balance of 0 to the csv file
-		return "SUCCESS";
+		return "\nNew account ADDED\n";
 	}
 
 	// Appends to a value to the end of a record by searching for an id
@@ -444,6 +498,77 @@ public class NewBank {
 		boolean b = newFile.delete();
 	}
 
+	private void changeCSVValue(String id, String newValue, int col, String path) {
+		// 'id' should be the unique numeric account ID, 'col' (column) starts at 1
+		// method will change one CSV value. Indexed on ID and column number.
+		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
+		File oldFile = new File(path);
+		File newFile = new File(tempFile);
+
+		try {
+			// Write to a temporary file
+			FileWriter fw = new FileWriter(tempFile, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter pw = new PrintWriter(bw);
+
+			// read the original data.csv file and searches for ID and appends value to the end
+			BufferedReader csvReader = new BufferedReader(new FileReader(path));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					String[] data = row.split(",");
+					if(data[0].equals(id)){
+						row = "";
+						for(int i = 0 ; i < data.length; i++){
+							if(i == col-1){
+								data[i] = newValue;
+							}
+							if(i<data.length-1){
+								row += data[i] + ",";
+							} else {
+								row += data[i];
+							}
+						}
+					}
+					pw.println(row);
+				}
+			}
+			pw.flush();
+			pw.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		try {
+			// Overwrites the original data.csv file
+			FileWriter fw2 = new FileWriter(path);
+			BufferedWriter bw2 = new BufferedWriter(fw2);
+			PrintWriter pw2 = new PrintWriter(bw2);
+
+			// Copies all data from temporary file
+			BufferedReader csvReader = new BufferedReader(new FileReader(tempFile));
+			String row = "placeholder";
+			while (row!= null) {
+				row = csvReader.readLine();
+				if(row!=null){
+					pw2.println(row);
+				}
+			}
+			pw2.flush();
+			pw2.close();
+			csvReader.close();
+
+		} catch (Exception e) {
+			//TODO: handle exception
+			e.printStackTrace();
+		}
+		// deletes the temporary file
+		boolean b = newFile.delete();
+	}
+
 
 	private String showMyAccounts (CustomerID customer){
 		return (customers.get(customer.getKey())).accountsToString();
@@ -457,28 +582,26 @@ public class NewBank {
 					String toBalance = customers.get(customer.getKey()).getBalance(to);
 					editLedger(customer.getKey(), from, fromBalance, ledger);
 					editLedger(customer.getKey(), to, toBalance, ledger);
-					return "SUCCESS";
+					return "\nTransfer of " + String.format("%.2f", amount) + " successful\n";
 				} else { // if adding was unsuccessful, add it back to the original account
 					(customers.get(customer.getKey())).editAccountBalance(from, amount);
 				}
 			}
 		}
-		return "FAIL";
+		return "\nWrong account name\n";
 	}
 
 	private String payment (String toID, Double amount, String from, String to){
-		if (amount > 0) { // should never need to move a negative amount
 			if (customers.get(id).editAccountBalance(from, -amount)) { // try to remove amount
 				if (transfer(toID, to, amount)) { // try to add amount
 					String fromBalance = customers.get(id).getBalance(from);
 					editLedger(id, from, fromBalance, ledger);
-					return "SUCCESS";
+					return "\nPayment of " + String.format("%.2f", amount) + " to " + toID + " successful\n";
 				} else { // if adding was unsuccessful, add it back to the original account
 					customers.get(id).editAccountBalance(from, amount);
 				}
 			}
-		}
-		return "FAIL";
+		return "\nDestination account not recognized.\nTransfer not executed\n";
 	}
 
 	private Boolean transfer (String toID, String accountName, Double amount){

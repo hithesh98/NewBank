@@ -33,25 +33,32 @@ Functional Requirements
 
 		FR5.1 User shall deposit money on its "Main" account.
 		
+		FR5.2 The system shall accept only correct amount.
+		
 	FR6	User shall be able to withdraw money. (WITHDRAW)
 	
 		FR6.1 User shall withdraw money from its "Main" account.
 		
 		FR6.2. User shall not withdraw more money that he has on his main account.
+		
+		FR6.3 The system shall accept only correct amount.
 
 	FR7	User shall be able to move money between his accounts. (MOVE)
 	
 		FR7.1 User shall not move more money that he has on the source account.
+		
+		FR7.2 The system shall accept only correct amount to move.
 
 	FR8	User shall be able to transfer money from his account to other user's account. (PAY)
 	
 		FR8.1 Pay function shall move money from user "Main" account to destination user "Main" account.
 		
 		FR8.2 User shall not transfer more money than he has on his "Main" account.
+		
+		FR8.3 The system shall accept only correct amount to transfer.
 
 	FR9	Register as a lender function – allows user to register as a lender for bank’s microloan service
 		FR9.1 The user must have the desired amount to loan in their main account
-
 
 	FR10	Show lender function – shows user a list of available micro-lenders
 
