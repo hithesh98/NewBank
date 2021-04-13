@@ -11,7 +11,7 @@ public class Account {
 	}
 
 	public String toString() {
-		return (accountName + ": " + openingBalance + " ");	
+		return (accountName + ": " + String.format("%.2f", openingBalance) + " ");	
 	}
 
 	public String getAccountName() {
