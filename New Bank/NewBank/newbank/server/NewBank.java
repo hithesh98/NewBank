@@ -277,7 +277,7 @@ public class NewBank {
 			if (request.startsWith("BORROWMICROLOAN")){
 			try {				
 				if (input.length != 4) { // return fail if not enough information is provided
-					return "\nPlease input correct format BORROWMICROLOAN <LENDER_ID> <Amount> <Term(in months)> \n";
+					return "\nPlease input correct format BORROWMICROLOAN <BORROWER_ID> <Amount> <Term(in months)> \n";
 				} else if(Double.parseDouble(input[2])<0 || !input[2].matches("-?\\d+(\\.\\d+)?")) {
 					return "\nPlease input correct amount\n";	
 				} else if (BigDecimal.valueOf(Double.parseDouble(input[2])).scale() > 2){
