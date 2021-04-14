@@ -4,13 +4,17 @@ A customer enters the command below and sees the messages returned
 
 LOGIN
 Allows user login, proceeds to entry of username and password
-Returns SUCCESS or FAIL
+Returns Log In Successful. What do you want to do?
+or User not recognized or wrong password! Please try again.
+or Too many failed login attempts! Please contact the bank.
 
 SIGNUP <USERNAME> <PASSWORD> <INITIAL DEPOSIT>
 Allows new user to sign up and creates a main bank account with initial deposit,
 then continues to the login information
 e.g. SIGNUP Samantha pa55word 100
-Returns SUCCESS or FAIL
+Returns USER CREATED
+or Please input <username> <password> <initial deposit>
+or User already exist. Please try different username.
 
 PASSWORDCHANGE <NEW PASSWORD> <VERIFY NEW PASSWORD>
 Allows a user to change their password
@@ -20,38 +24,57 @@ or New password and verify new password should match
 or Password has been successfully changed
 
 SHOWMYACCOUNTS
-Returns a list of all the customers accounts along with their current balance 
-e.g. Main: 1000.0 
+Prints a list of all the customers accounts along with their current balance 
+e.g. Main: 1000.0
+Returns void
 
 NEWACCOUNT <Name>
 e.g. NEWACCOUNT Savings
-Returns SUCCESS or FAIL
+Returns Please input correct name of the account
+or New account ADDED
 
 DEPOSIT <Amount>
 Allows user to deposit money on his Main account
 e.g. DEPOSIT 100
 Returns Deposit of <Amount> accepted
-or Please input correct format
+or Please input correct format e.g. DEPOSIT <amount>
 or Please input correct amount
+or Please input amount to 2 decimal places
 
 WITHDRAW <Amount>
 Allows user to withdraw money from his Main account
 e.g. WITHDRAW 100
 Returns Withdraw of <Amount> successful
-or Please input correct format
+or Please input correct format e.g. WITHDRAW <amount>
 or Not sufficient balance on the Main account
+or Please input correct amount
+or Please input amount to 2 decimal places
+or Withdraw of <amount> successful
 
 MOVE <Amount> <From> <To>
 e.g. MOVE 100 Main Savings 
-Returns SUCCESS or FAIL
+Returns Please input correct format MOVE <amount> <from> <to>
+or Please input correct amount
+or Please input amount to 2 decimal places
+or Not sufficient balance on the <from> account
+or Transfer of <amount> successful
+or Wrong account name
 
-PAY <ID>
+PAY <ID> <amount>
 e.g. PAY 4085078 50
-Returns SUCCESS or FAIL
+Returns Please input correct format PAY <ID> <amount>
+or Please input correct amount
+or Please input amount to 2 decimal places
+or Not sufficient balance on the Main account
+or Payment of <amount> to <ID> successful
+or Destination account not recognized. Transfer not executed
 
 REGISTERLENDER <AMOUNT>
 eg:REGISTERLENDER 123
-Returns REGISTERED AS A LENDER or FAIL
+Returns Please input correct amount
+or REGISTERED AS A LENDER
+or ALREADY REGISTERED AS A LENDER
+or Impossible to execute
 
 SHOWMICROLENDERS
 eg: SHOWMICROLENDERS
@@ -59,11 +82,24 @@ Returns LIST OF MICROLENDERS
 
 BORROWMICROLOAN <LENDER_ID> <Amount> <Term(in months)>
 eg:BORROWMICROLOAN 2362063 20 2
-Returns LOAN GRANTED/FAIL
+Returns Please input correct format BORROWMICROLOAN <BORROWER_ID> <Amount> <Term(in months)>
+or Please input correct amount
+or Please input amount to 2 decimal places
+or Please input correct format for <Term(in months)> Max Term is 36 months
+or <Term> must be an integer between 1 and 36
+or Lender cannot be found
+or LOAN GRANTED
+or Amount greater than max loan available
+or SOMETHING WENT WRONG
 
 LOANREPAYMENT <LOAN_ID> <Amount>
 eg:LOANREPAYMENT 7777676 5
-Returns OUTSTANDING LOAN/FAIL
+Returns Please input correct format LOANREPAYMENT <LOAN_ID> <Amount>
+or Please input correct amount
+or Please input amount to 2 decimal places
+or loan id cannot be found
+or LOAN REPAID
+or Amount greater than max loan available
 
 TEST CREDENTIALS FOR USERS:
 USERNAME,PASSWORD
