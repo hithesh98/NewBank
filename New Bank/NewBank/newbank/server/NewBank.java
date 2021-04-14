@@ -55,7 +55,6 @@ public class NewBank {
 			}
 			csvReader.close();
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 			;
 		}
@@ -84,7 +83,6 @@ public class NewBank {
 				return 1; // fail, no username/password match
 			}
 		} catch (Exception e) {
-			//TODO: handle exception
 			return -1; //undefined error
 		}
 	}
@@ -110,7 +108,6 @@ public class NewBank {
 		try {
 			password = generateHash(password, algorithm);
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (userName.equals(accountusername) && (password.equals(accountpassword))) {
@@ -152,7 +149,6 @@ public class NewBank {
 				try {
 					 hashedPass = generateHash(input[2], algorithm);
 				} catch (NoSuchAlgorithmException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				fw.append("\n");
@@ -270,7 +266,6 @@ public class NewBank {
 						}
 
 				} catch (Exception e) {
-					//TODO: handle exception
 					return "\nWrong command\n";
 				}
 			}
@@ -289,8 +284,7 @@ public class NewBank {
 					try {
 						Integer term = Integer.parseInt(input[3]);
 					} catch (Exception e) {
-						//TODO: handle exception
-						checkterm = false;
+							checkterm = false;
 						return "\n<Term> must be an integer between 1 and 36\n";
 					}
 					if(checkterm){
@@ -298,7 +292,6 @@ public class NewBank {
 					}
 				}
 			} catch (Exception e) {
-				//TODO: handle exception
 				return "\nWrong command\n";
 			}
 			}
@@ -419,7 +412,6 @@ public class NewBank {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			//TODO: handle exception
 			return "\nLender cannot be found\n";
 		}
 		String[] lenderValues = lenderDetails.split(",");
@@ -508,7 +500,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		try {
@@ -531,7 +522,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		// deletes the temporary file
@@ -579,7 +569,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		try {
@@ -602,7 +591,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		// deletes the temporary file
@@ -650,7 +638,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		try {
@@ -673,7 +660,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		// deletes the temporary file
@@ -760,7 +746,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		try {
@@ -783,7 +768,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		// deletes the temporary file
@@ -830,7 +814,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		try {
@@ -853,7 +836,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		// deletes the temporary file
@@ -895,7 +877,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		try {
@@ -918,7 +899,6 @@ public class NewBank {
 			csvReader.close();
 
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 		}
 		// deletes the temporary file
@@ -944,7 +924,6 @@ public class NewBank {
 			}
 			csvReader.close();
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();
 			;
 		}
@@ -972,7 +951,6 @@ public class NewBank {
 			}
 			csvReader.close();
 		} catch (Exception e) {
-			//TODO: handle exception
 			e.printStackTrace();;
 		}
 		return result;
