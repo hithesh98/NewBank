@@ -60,13 +60,19 @@ Functional Requirements
 	FR9	Register as a lender function – allows user to register as a lender for bank’s microloan service
 		FR9.1 The user must have the desired amount to loan in their main account
 
-	FR10	Show lender function – shows user a list of available micro-lenders
+	FR10	User shall be able to register as a lender.
+	
+	FR11	User shall be able to borrow a loan from registered lenders.
+	
+		FR11.1 User shall be able to specify amount of the loan.
+		
+		FR11.2 User shall be able to choose from which lender he wants to take the loan.
+		
+		FR11.3 User shall specify for how long he wants to take the loan for.
 
-	FR11	Borrow from a micro-loan – allows user to borrow a micro-lender specifying amount needed and repayment term, any income details, credit checks. 
+	FR12	The system shall be able to show available lenders and loans. (SHOWMICROLENDERS)
 
-	FR12	Show loans and applicable interest rate – show the user current outstanding loans and applicable interest rate
-
-	FR13    Repayment function - allows user to repay the outstanding loans and applicable interest rate
+	FR13    The user shall be able to repay the loan.
 
 	FR14	User shall be able to log out of the system. (LOGOFF)
 	
