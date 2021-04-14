@@ -50,6 +50,7 @@ public class NewBank {
 				if (data[col-1].equals(search)) {
 					userDetails = row;
 					idFound = true;
+					csvReader.close();
 					return userDetails;
 				}
 			}
@@ -282,7 +283,7 @@ public class NewBank {
 				} else {
 					Boolean checkterm = true;
 					try {
-						Integer term = Integer.parseInt(input[3]);
+						Integer.parseInt(input[3]);
 					} catch (Exception e) {
 							checkterm = false;
 						return "\n<Term> must be an integer between 1 and 36\n";
@@ -472,7 +473,7 @@ public class NewBank {
 	private void editEnd (String search, String stringAdd){
 		String filepath = ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv";
 		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
-		File oldFile = new File(filepath);
+		new File(filepath);
 		File newFile = new File(tempFile);
 
 
@@ -524,14 +525,13 @@ public class NewBank {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// deletes the temporary file
-		boolean b = newFile.delete();
+		newFile.delete();
 	}
 
 	private void editLedger(String search, String account, String stringAdd, String path) {
 		String filepath = path;
 		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
-		File oldFile = new File(filepath);
+		new File(filepath);
 		File newFile = new File(tempFile);
 
 
@@ -593,15 +593,14 @@ public class NewBank {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// deletes the temporary file
-		boolean b = newFile.delete();
+		newFile.delete();
 	}
 
 	private void changeCSVValue(String id, String newValue, int col, String path) {
 		// 'id' should be the unique numeric account ID, 'col' (column) starts at 1
 		// method will change one CSV value. Indexed on ID and column number.
 		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
-		File oldFile = new File(path);
+		new File(path);
 		File newFile = new File(tempFile);
 
 		try {
@@ -662,8 +661,7 @@ public class NewBank {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// deletes the temporary file
-		boolean b = newFile.delete();
+		newFile.delete();
 	}
 
 
@@ -705,7 +703,7 @@ public class NewBank {
 		Boolean result = false;
 		String filepath = ".\\New Bank\\NewBank\\newbank\\server\\ledger.csv";
 		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
-		File oldFile = new File(filepath);
+		new File(filepath);
 		File newFile = new File(tempFile);
 
 
@@ -770,8 +768,7 @@ public class NewBank {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// deletes the temporary file
-		boolean b = newFile.delete();
+		newFile.delete();
 		return result;
 	}
 
@@ -779,7 +776,7 @@ public class NewBank {
 		boolean result = true;
 		String filepath = path;
 		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
-		File oldFile = new File(filepath);
+		new File(filepath);
 		File newFile = new File(tempFile);
 
 
@@ -838,8 +835,7 @@ public class NewBank {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// deletes the temporary file
-		boolean b = newFile.delete();
+		newFile.delete();
 		return result;
 	}
 
@@ -847,7 +843,7 @@ public class NewBank {
 		boolean result = true;
 		String filepath = path;
 		String tempFile = ".\\New Bank\\NewBank\\newbank\\server\\temp.csv";
-		File oldFile = new File(filepath);
+		new File(filepath);
 		File newFile = new File(tempFile);
 
 
@@ -901,8 +897,7 @@ public class NewBank {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// deletes the temporary file
-		boolean b = newFile.delete();
+		newFile.delete();
 		return result;
 	}
 
@@ -919,6 +914,7 @@ public class NewBank {
 				if (data[col].equals(search)) {
 					result = row;
 					idFound = true;
+					csvReader.close();
 					return result;
 				}
 			}
