@@ -14,26 +14,6 @@ public class Customer {
 	public void setAccounts(ArrayList<Account> accounts) {
 		this.accounts = accounts;
 	}
-
-	public ArrayList<MicroLoan> getLoans() {
-		return loans;
-	}
-
-	public void setLoans(ArrayList<MicroLoan> loans) {
-		this.loans = loans;
-	}
-
-	private ArrayList<MicroLoan> loans;
-
-	public String getLender() {
-		return lender;
-	}
-
-	public void setLender(String lender) {
-		this.lender = lender;
-	}
-
-	private String lender;
 	
 	public Customer() {
 		accounts = new ArrayList<>();
